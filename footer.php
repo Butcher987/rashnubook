@@ -16,13 +16,19 @@ $phone      = rashnubook_get_option('phone', '۰۲۱-۸۸۹۹۰۰۱۱');
 $email      = rashnubook_get_option('email', 'info@rashnubook.ir');
 $copyright  = rashnubook_get_option('copyright_text', 'تمامی حقوق برای کتابفروشی آنلاین رَشن (rashnubook.ir) محفوظ است.');
 
-// Social media links
-$social_instagram = rashnubook_get_option('social_instagram', 'https://instagram.com/rashno_book');
-$social_telegram  = rashnubook_get_option('social_telegram', 'https://t.me/rashno_book');
-$social_whatsapp  = rashnubook_get_option('social_whatsapp', '');
-$social_bale      = rashnubook_get_option('social_bale', '');
-$social_eitaa     = rashnubook_get_option('social_eitaa', '');
-$social_x         = rashnubook_get_option('social_x', '');
+// Social media links (editable via Customizer > شبکه‌های اجتماعی رشنو بوک)
+$social_instagram = rashnubook_fix_social_url('instagram', 'https://instagram.com/rashno_book');
+$social_telegram  = rashnubook_fix_social_url('telegram', 'https://t.me/rashno_book');
+$social_whatsapp  = rashnubook_fix_social_url('whatsapp', '');
+$social_bale      = rashnubook_fix_social_url('bale', '');
+$social_eitaa     = rashnubook_fix_social_url('eitaa', '');
+$social_x         = rashnubook_fix_social_url('x', '');
+
+$ig_handle = '';
+if (!empty($social_instagram)) {
+    $ig_handle = preg_replace('#^https?://(www\.)?instagram\.com/?#i', '', $social_instagram);
+    $ig_handle = ltrim(trim((string) $ig_handle, '/ '), '@');
+}
 ?>
     <footer id="colophon" class="site-footer">
         <div class="container">
@@ -43,32 +49,32 @@ $social_x         = rashnubook_get_option('social_x', '');
                     <!-- Official Social Media Links (Only displayed if link is provided) -->
                     <div class="footer-socials" style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
                         <?php if (!empty($social_instagram)) : ?>
-                            <a href="<?php echo esc_url($social_instagram); ?>" target="_blank" rel="noopener" title="اینستاگرام" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#ffe088; text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='#E1306C'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#ffe088';">
+                            <a href="<?php echo esc_url($social_instagram); ?>" target="_blank" rel="noopener" title="اینستاگرام" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; text-decoration:none; transition:all 0.25s;">
                                 <?php rashnubook_icon('instagram'); ?>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($social_telegram)) : ?>
-                            <a href="<?php echo esc_url($social_telegram); ?>" target="_blank" rel="noopener" title="کانال تلگرام" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#ffe088; text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='#229ED9'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#ffe088';">
+                            <a href="<?php echo esc_url($social_telegram); ?>" target="_blank" rel="noopener" title="کانال تلگرام" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; text-decoration:none; transition:all 0.25s;">
                                 <?php rashnubook_icon('telegram'); ?>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($social_whatsapp)) : ?>
-                            <a href="<?php echo esc_url($social_whatsapp); ?>" target="_blank" rel="noopener" title="واتساپ پشتیبانی" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#ffe088; text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='#25D366'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#ffe088';">
+                            <a href="<?php echo esc_url($social_whatsapp); ?>" target="_blank" rel="noopener" title="واتساپ پشتیبانی" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; text-decoration:none; transition:all 0.25s;">
                                 <?php rashnubook_icon('whatsapp'); ?>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($social_bale)) : ?>
-                            <a href="<?php echo esc_url($social_bale); ?>" target="_blank" rel="noopener" title="پیام‌رسان بله" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#ffe088; text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='#16B37E'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#ffe088';">
+                            <a href="<?php echo esc_url($social_bale); ?>" target="_blank" rel="noopener" title="پیام‌رسان بله" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; text-decoration:none; transition:all 0.25s;">
                                 <?php rashnubook_icon('bale'); ?>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($social_eitaa)) : ?>
-                            <a href="<?php echo esc_url($social_eitaa); ?>" target="_blank" rel="noopener" title="پیام‌رسان ایتا" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#ffe088; text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='#E86B1E'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#ffe088';">
+                            <a href="<?php echo esc_url($social_eitaa); ?>" target="_blank" rel="noopener" title="پیام‌رسان ایتا" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; text-decoration:none; transition:all 0.25s;">
                                 <?php rashnubook_icon('eitaa'); ?>
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($social_x)) : ?>
-                            <a href="<?php echo esc_url($social_x); ?>" target="_blank" rel="noopener" title="شبکه اجتماعی X" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#ffe088; text-decoration:none; transition:all 0.25s;" onmouseover="this.style.background='#000000'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#ffe088';">
+                            <a href="<?php echo esc_url($social_x); ?>" target="_blank" rel="noopener" title="شبکه اجتماعی X" class="footer-social-btn" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; text-decoration:none; transition:all 0.25s;">
                                 <?php rashnubook_icon('x'); ?>
                             </a>
                         <?php endif; ?>
@@ -81,8 +87,8 @@ $social_x         = rashnubook_get_option('social_x', '');
                     <ul class="footer-links">
                         <li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('صفحه اصلی کتاب‌سرا', 'rashnubook'); ?></a></li>
                         <?php if (class_exists('WooCommerce')) : ?>
-                            <li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('ویترین و کاتالوگ کتاب‌ها', 'rashnubook'); ?></a></li>
-                            <li><a href="<?php echo esc_url(wc_get_cart_url()); ?>"><?php esc_html_e('سبد خرید و تسویه', 'rashnubook'); ?></a></li>
+                            <li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('کتاب‌ها و دیگر محصولات', 'rashnubook'); ?></a></li>
+                            <li><a href="<?php echo esc_url(wc_get_cart_url())); ?>"><?php esc_html_e('سبد خرید و تسویه', 'rashnubook'); ?></a></li>
                             <li><a href="<?php echo esc_url(wc_get_account_endpoint_url('orders')); ?>"><?php esc_html_e('پیگیری و سوابق سفارش', 'rashnubook'); ?></a></li>
                         <?php endif; ?>
                         <li><a href="<?php echo esc_url(home_url('/aftabgardan/')); ?>"><?php esc_html_e('ماهنامه ادبی آفتابگردان', 'rashnubook'); ?></a></li>
@@ -117,16 +123,21 @@ $social_x         = rashnubook_get_option('social_x', '');
                             <strong><?php esc_html_e('ایمیل:', 'rashnubook'); ?></strong> <?php echo esc_html($email); ?>
                         </p>
                     <?php endif; ?>
+                    <?php if (!empty($ig_handle)) : ?>
                     <p style="font-size: 13.5px; color: #ffffff; margin-bottom: 16px;">
-                        <strong>اینستاگرام:</strong> <a href="<?php echo esc_url($social_instagram); ?>" target="_blank" rel="noopener" style="color:var(--tertiary); font-weight:700;">@rashno_book</a>
+                        <strong>اینستاگرام:</strong> <a href="<?php echo esc_url($social_instagram); ?>" target="_blank" rel="noopener" style="color:var(--tertiary); font-weight:700;"><bdi dir="ltr">@<?php echo esc_html($ig_handle); ?></bdi></a>
                     </p>
+                    <?php endif; ?>
+                    <?php if (get_theme_mod('rashnubook_newsletter_enable', true)) : ?>
                     <div style="background: rgba(255,255,255,0.06); padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.1);">
-                        <span style="font-size: 12px; display: block; margin-bottom: 6px; color: #a5d0b9;">عضویت در خبرنامه یادداشت‌های ادبی و حقوقی:</span>
-                        <div style="display: flex; gap: 6px;">
-                            <input type="email" placeholder="نشانی ایمیل..." style="flex:1; padding: 6px 10px; border-radius: 4px; border: none; font-size: 12px; outline: none; background: #fff; color: #1f2421;">
-                            <button type="button" class="btn btn-tertiary" style="padding: 6px 12px; font-size: 12px;"><?php esc_html_e('ثبت', 'rashnubook'); ?></button>
-                        </div>
+                        <span style="font-size: 12px; display: block; margin-bottom: 6px; color: #a5d0b9;"><?php echo esc_html(get_theme_mod('rashnubook_newsletter_title', 'عضویت در خبرنامه یادداشت‌های ادبی و حقوقی:')); ?></span>
+                        <form class="rb-newsletter-form" style="display: flex; gap: 6px;" novalidate>
+                            <input type="email" name="email" required placeholder="نشانی ایمیل..." style="flex:1; padding: 6px 10px; border-radius: 4px; border: none; font-size: 12px; outline: none; background: #fff; color: #1f2421; direction:ltr; text-align:left;">
+                            <button type="submit" class="btn btn-tertiary" style="padding: 6px 12px; font-size: 12px; cursor:pointer;"><?php esc_html_e('ثبت', 'rashnubook'); ?></button>
+                        </form>
+                        <p class="rb-newsletter-msg" aria-live="polite"></p>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -204,6 +215,38 @@ $social_x         = rashnubook_get_option('social_x', '');
         <?php endif; ?>
     </nav>
 </div><!-- #page -->
+
+<script>
+(function () {
+    var form = document.querySelector('.rb-newsletter-form');
+    if (!form) { return; }
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var msg = form.parentElement.querySelector('.rb-newsletter-msg');
+        var email = form.querySelector('input[name="email"]').value.trim();
+        if (!email) { return; }
+        var data = new URLSearchParams();
+        data.append('action', 'rashnubook_newsletter');
+        data.append('nonce', window.rashnubook_ajax ? window.rashnubook_ajax.newsletter_nonce : '');
+        data.append('email', email);
+        fetch(window.rashnubook_ajax.ajax_url, { method: 'POST', body: data })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (msg) {
+                    msg.textContent = (res && res.data && res.data.message) ? res.data.message : '';
+                    msg.className = 'rb-newsletter-msg is-visible ' + (res && res.success ? 'is-success' : 'is-error');
+                }
+                if (res && res.success) { form.reset(); }
+            })
+            .catch(function () {
+                if (msg) {
+                    msg.textContent = 'خطا در برقراری ارتباط. لطفاً دوباره تلاش کنید.';
+                    msg.className = 'rb-newsletter-msg is-visible is-error';
+                }
+            });
+    });
+})();
+</script>
 
 <?php wp_footer(); ?>
 </body>

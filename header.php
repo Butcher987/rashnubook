@@ -8,6 +8,8 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+$rb_ig_handle = ltrim(rashnubook_get_option('instagram', 'rashno_book'), '@');
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?> dir="rtl">
 <head>
@@ -31,10 +33,10 @@ if (!defined('ABSPATH')) {
                     <span><?php echo esc_html(rashnubook_get_option('topbar_text', 'ارسال سریع و کاملاً رایگان کتاب به سراسر کشور | اینستاگرام: rashno_book@')); ?></span>
                 </div>
                 <div class="topbar-info" style="display: flex; align-items: center; gap: 16px;">
-                    <a href="https://instagram.com/<?php echo esc_attr(rashnubook_get_option('instagram', 'rashno_book')); ?>" target="_blank" rel="noopener" style="color:#ffe088; display:flex; align-items:center; gap:6px; font-weight:700; text-decoration:none;">
+                    <a href="https://instagram.com/<?php echo esc_attr($rb_ig_handle); ?>" target="_blank" rel="noopener" style="display:flex; align-items:center; gap:6px; font-weight:700; text-decoration:none;">
                         <?php rashnubook_icon('instagram'); ?>
                         <span>اینستاگرام:</span>
-                        <span><?php echo esc_html(rashnubook_get_option('instagram', 'rashno_book')); ?>@</span>
+                        <bdi dir="ltr">@<?php echo esc_html($rb_ig_handle); ?></bdi>
                     </a>
                     <span style="opacity: 0.4;">|</span>
                     <span><?php esc_html_e('پشتیبانی:', 'rashnubook'); ?> <?php echo esc_html(rashnubook_get_option('phone', '۰۲۱-۸۸۹۹۰۰۱۱')); ?></span>
@@ -124,10 +126,11 @@ if (!defined('ABSPATH')) {
                         ?>
                         <a href="<?php echo esc_url(home_url('/')); ?>" class="<?php echo is_front_page() ? 'active' : ''; ?>"><?php esc_html_e('خانه', 'rashnubook'); ?></a>
                         <?php if (class_exists('WooCommerce')) : ?>
-                            <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="<?php echo is_shop() ? 'active' : ''; ?>"><?php esc_html_e('کتاب‌ها و کاتالوگ', 'rashnubook'); ?></a>
+                            <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="<?php echo is_shop() ? 'active' : ''; ?>"><?php esc_html_e('کتاب‌ها و دیگر محصولات', 'rashnubook'); ?></a>
                         <?php endif; ?>
-                        <a href="<?php echo esc_url(home_url('/aftabgardan/')); ?>"><?php esc_html_e('صفحه فرود ویژه', 'rashnubook'); ?></a>
-                        <a href="<?php echo esc_url(home_url('/blog/')); ?>"><?php esc_html_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?></a>
+                        <a href="<?php echo esc_url(home_url('/#categories')); ?>"><?php esc_html_e('دسته‌بندی‌ها', 'rashnubook'); ?></a>
+                        <a href="<?php echo esc_url(home_url('/aftabgardan/')); ?>"><?php esc_html_e('رویدادهای ویژه', 'rashnubook'); ?></a>
+                        <a href="<?php echo esc_url(rashnubook_fix_blog_url()); ?>"><?php esc_html_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?></a>
                         <?php
                     }
                     ?>
@@ -201,10 +204,10 @@ if (!defined('ABSPATH')) {
                     <ul class="mobile-nav-list">
                         <li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('صفحه اصلی', 'rashnubook'); ?></a></li>
                         <?php if (class_exists('WooCommerce')) : ?>
-                            <li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('ویترین و کاتالوگ کتاب‌ها', 'rashnubook'); ?></a></li>
+                            <li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('کتاب‌ها و دیگر محصولات', 'rashnubook'); ?></a></li>
                         <?php endif; ?>
                         <li><a href="<?php echo esc_url(home_url('/aftabgardan/')); ?>"><?php esc_html_e('ماهنامه ادبی آفتابگردان (صفحه ویژه)', 'rashnubook'); ?></a></li>
-                        <li><a href="<?php echo esc_url(home_url('/blog/')); ?>"><?php esc_html_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?></a></li>
+                        <li><a href="<?php echo esc_url(rashnubook_fix_blog_url()); ?>"><?php esc_html_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?></a></li>
                         <li><a href="<?php echo esc_url(home_url('/about-us/')); ?>"><?php esc_html_e('درباره کتابفروشی آنلاین رَشن', 'rashnubook'); ?></a></li>
                         <li><a href="<?php echo esc_url(home_url('/contact-us/')); ?>"><?php esc_html_e('تماس با ما و ساعات کاری', 'rashnubook'); ?></a></li>
                     </ul>
@@ -221,9 +224,9 @@ if (!defined('ABSPATH')) {
                         <span><?php is_user_logged_in() ? esc_html_e('ورود به حساب کاربری', 'rashnubook') : esc_html_e('ورود / عضویت سریع', 'rashnubook'); ?></span>
                     </a>
                 <?php endif; ?>
-                <a href="https://instagram.com/<?php echo esc_attr(rashnubook_get_option('instagram', 'rashno_book')); ?>" target="_blank" rel="noopener" class="drawer-action-btn drawer-instagram-btn">
+                <a href="https://instagram.com/<?php echo esc_attr($rb_ig_handle); ?>" target="_blank" rel="noopener" class="drawer-action-btn drawer-instagram-btn">
                     <?php rashnubook_icon('instagram'); ?>
-                    <span>اینستاگرام: rashno_book@</span>
+                    <span>اینستاگرام: <bdi dir="ltr">@<?php echo esc_html($rb_ig_handle); ?></bdi></span>
                 </a>
             </div>
         </div>
@@ -246,3 +249,4 @@ if (!defined('ABSPATH')) {
             </div>
         </aside>
     <?php endif; ?>
+
