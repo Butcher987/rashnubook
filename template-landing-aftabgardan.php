@@ -10,6 +10,14 @@ if (!defined('ABSPATH')) {
 }
 
 get_header();
+
+$rb_page_id          = get_the_ID();
+$rb_single_id        = (int) rashnubook_fix_meta($rb_page_id, 'rb_aftab_single_id', '812');
+$rb_annual_id        = (int) rashnubook_fix_meta($rb_page_id, 'rb_aftab_annual_id', '813');
+$rb_single_price     = rashnubook_fix_meta($rb_page_id, 'rb_aftab_single_price', '145000');
+$rb_annual_price     = rashnubook_fix_meta($rb_page_id, 'rb_aftab_annual_price', '1450000');
+$rb_single_price_fmt = is_numeric($rb_single_price) ? rashnubook_to_persian_numbers(number_format((float) $rb_single_price)) : $rb_single_price;
+$rb_annual_price_fmt = is_numeric($rb_annual_price) ? rashnubook_to_persian_numbers(number_format((float) $rb_annual_price)) : $rb_annual_price;
 ?>
 
 <main id="primary" class="site-main landing-page-wrapper">
@@ -180,7 +188,7 @@ get_header();
                             <span style="display:inline-block; padding:4px 12px; background:var(--ivory); color:var(--mocha); border-radius:12px; font-size:12px; font-weight:800; margin-bottom:12px;">خرید تک‌شماره</span>
                             <h3 style="font-size:20px; font-weight:900; color:var(--mocha); margin-bottom:12px;">شماره ۱۲ ماهنامه (چاپی)</h3>
                             <div style="font-size:24px; font-weight:900; color:var(--primary); margin:16px 0;">
-                                <?php echo esc_html(rashnubook_to_persian_numbers('145000')); ?> تومان
+                                <?php echo esc_html($rb_single_price_fmt); ?> تومان
                             </div>
                             <ul style="list-style:none; padding:0; margin:0 0 24px; font-size:13.5px; line-height:2.2; color:var(--charcoal-muted); text-align:right;">
                                 <li>✓ ۱۸۰ صفحه کاغذ بالکی اعلا</li>
@@ -188,7 +196,7 @@ get_header();
                                 <li>✓ دسترسی به پادکست و ضمیمه صوتی</li>
                             </ul>
                         </div>
-                        <a href="<?php echo esc_url(home_url('/cart/?add-to-cart=812')); ?>" class="btn btn-primary" style="width:100%; padding:12px; font-size:14.5px; font-weight:800; border-radius:8px;">
+                        <a href="<?php echo esc_url(home_url('/cart/?add-to-cart=' . $rb_single_id)); ?>" class="btn btn-primary" style="width:100%; padding:12px; font-size:14.5px; font-weight:800; border-radius:8px;">
                             سفارش نسخه چاپی شماره ۱۲
                         </a>
                     </div>
@@ -202,7 +210,7 @@ get_header();
                             <span style="display:inline-block; padding:4px 12px; background:rgba(31,77,58,0.1); color:var(--primary); border-radius:12px; font-size:12px; font-weight:800; margin-bottom:12px;">اشتراک ۱۲ ماهه (سالانه)</span>
                             <h3 style="font-size:20px; font-weight:900; color:var(--mocha); margin-bottom:12px;">اشتراک کامل چاپی + هدیه کتاب</h3>
                             <div style="font-size:24px; font-weight:900; color:var(--primary); margin:16px 0;">
-                                <?php echo esc_html(rashnubook_to_persian_numbers('1450000')); ?> تومان
+                                <?php echo esc_html($rb_annual_price_fmt); ?> تومان
                             </div>
                             <ul style="list-style:none; padding:0; margin:0 0 24px; font-size:13.5px; line-height:2.2; color:var(--charcoal-muted); text-align:right;">
                                 <li>✓ دریافت ماهانه ۱۲ شماره مجله با ارسال رایگان</li>
@@ -211,7 +219,7 @@ get_header();
                                 <li>✓ ۲۰٪ تخفیف دائمی بر روی تمامی کتاب‌های سایت</li>
                             </ul>
                         </div>
-                        <a href="<?php echo esc_url(home_url('/cart/?add-to-cart=813')); ?>" class="btn btn-primary" style="width:100%; padding:12px; font-size:14.5px; font-weight:900; border-radius:8px; background:var(--primary);">
+                        <a href="<?php echo esc_url(home_url('/cart/?add-to-cart=' . $rb_annual_id)); ?>" class="btn btn-primary" style="width:100%; padding:12px; font-size:14.5px; font-weight:900; border-radius:8px; background:var(--primary);">
                             ثبت اشتراک سالانه طلایی
                         </a>
                     </div>
