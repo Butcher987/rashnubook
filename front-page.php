@@ -23,6 +23,10 @@ get_header();
 
 $shop_url = class_exists('WooCommerce') ? wc_get_page_permalink('shop') : '#categories';
 
+// Hero background image (Customizer > اسلایدر هیرو)
+$hero_bg_img  = get_theme_mod('rashnubook_hero_bg_image', '');
+$hero_overlay = get_theme_mod('rashnubook_hero_overlay', '0.55');
+
 // Master Visibility Toggles
 $hero_enable       = rashnubook_get_option('hero_enable', '1') !== '0';
 $hero_autoplay     = rashnubook_get_option('hero_autoplay', '1') !== '0' ? 'true' : 'false';
@@ -49,7 +53,7 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
             $active_slides = array_values($active_slides);
             $total_active = count($active_slides);
         ?>
-            <section class="tento-hero-slider" data-hero-slider data-autoplay="<?php echo esc_attr($hero_autoplay); ?>" data-interval="<?php echo esc_attr($hero_interval); ?>" role="region" aria-label="<?php esc_attr_e('اسلایدر معرفی کتاب‌های برگزیده', 'rashnubook'); ?>">
+            <section class="tento-hero-slider <?php echo $hero_bg_img ? 'has-bg-image' : ''; ?>" <?php if ($hero_bg_img) : ?>style="background-image:url('<?php echo esc_url($hero_bg_img); ?>'); --rb-hero-overlay:<?php echo esc_attr($hero_overlay); ?>;"<?php endif; ?> data-hero-slider data-autoplay="<?php echo esc_attr($hero_autoplay); ?>" data-interval="<?php echo esc_attr($hero_interval); ?>" role="region" aria-label="<?php esc_attr_e('اسلایدر معرفی کتاب‌های برگزیده', 'rashnubook'); ?>">
                 <div class="tento-hero-slides">
                     <?php foreach ($active_slides as $index => $slide) :
                         $is_first = ($index === 0);
@@ -316,9 +320,9 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
             $bl_title   = rashnubook_get_option('home_blog_title', 'یادداشت‌های تحلیلی و معرفی کتاب‌ها');
             $bl_count   = (int)rashnubook_get_option('home_blog_count', 3);
             $bl_link_t  = rashnubook_get_option('home_blog_link_text', 'آرشیو همه یادداشت‌ها');
-            $bl_link_u  = rashnubook_get_option('home_blog_link_url', home_url('/?post_type=post'));
+            $bl_link_u  = rashnubook_get_option('home_blog_link_url', '');
             if (empty($bl_link_u)) {
-                $bl_link_u = home_url('/?post_type=post');
+                $bl_link_u = rashnubook_fix_blog_url();
             }
         ?>
             <section class="tento-articles-section" aria-label="<?php esc_attr_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?>">
@@ -349,6 +353,8 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
                             if (!$thumb) {
                                 $thumb = RASHNUBOOK_URI . '/assets/images/rashnu-logo.jpg';
                             }
+                            $rb_words = count(preg_split('/\s+/u', wp_strip_all_tags(get_the_content())));
+                            $rb_read_minutes = max(1, (int) ceil($rb_words / 200));
                     ?>
                         <article class="tento-article-card">
                             <a href="<?php the_permalink(); ?>" class="tento-article-media">
@@ -359,7 +365,7 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
                                 <div class="tento-article-meta">
                                     <span><?php echo esc_html(get_the_date('j F Y')); ?></span>
                                     <span>•</span>
-                                    <span>زمان مطالعه: ۵ دقیقه</span>
+                                    <span>زمان مطالعه: <?php echo esc_html(rashnubook_to_persian_numbers($rb_read_minutes)); ?> دقیقه</span>
                                 </div>
                                 <h3 class="tento-article-title">
                                     <a href="<?php the_permalink(); ?>" style="color:inherit; text-decoration:none;">
@@ -377,8 +383,12 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
                     <?php
                         endwhile;
                         wp_reset_postdata();
-                    endif;
-                    ?>
+                    else : ?>
+                        <div style="background: var(--paper); border: 1px dashed var(--border-editorial); border-radius: var(--radius-md); padding: 32px; text-align: center; color: var(--charcoal-muted); font-size: 14px; line-height: 2;">
+                            هنوز یادداشتی در کتاب‌سرا منتشر نشده است.<br>
+                            برای افزودن یا ویرایش یادداشت‌ها از بخش «پیشخوان &larr; نوشته‌ها &larr; افزودن نوشته» استفاده کنید؛ جدیدترین نوشته‌ها به‌صورت خودکار در این بخش نمایش داده می‌شوند.
+                        </div>
+                    <?php endif; ?>
                 </div>
             </section>
         <?php endif; ?>
