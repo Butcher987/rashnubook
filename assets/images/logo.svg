@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none">
+  <g transform="translate(185, 8)">
+    <path d="M22 2 C16 10, 8 18, 2 34 C12 30, 20 31, 22 42 C24 31, 32 30, 42 34 C36 18, 28 10, 22 2 Z" fill="#1b4332" />
+    <path d="M22 10 L22 38" stroke="#d4af37" stroke-width="1.8" stroke-linecap="round" />
+    <circle cx="22" cy="7" r="2.5" fill="#d4af37" />
+    <path d="M12 24 C16 26, 20 28, 22 34 C24 28, 28 26, 32 24" stroke="#d4af37" stroke-width="1.2" fill="none" stroke-linecap="round" />
+  </g>
+  <text x="175" y="28" font-family="'Vazirmatn', 'Tahoma', sans-serif" font-weight="800" font-size="20" fill="#1b4332" text-anchor="end" direction="rtl">کتاب‌سرای رشنو</text>
+  <text x="175" y="45" font-family="'Vazirmatn', 'Tahoma', sans-serif" font-weight="600" font-size="11" fill="#52796f" text-anchor="end" direction="rtl">rashnubook.ir</text>
+</svg>
