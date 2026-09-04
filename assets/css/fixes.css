@@ -1,0 +1,65 @@
+/*
+ * Rashnubook theme fixes — Batch 1
+ * Loaded after main.css / woocommerce.css
+ */
+
+/* 1) Topbar Instagram — uniform white/cream like other topbar items */
+.topbar-ticker a[href*="instagram.com"] {
+    color: #f5efe2 !important;
+}
+.topbar-ticker a[href*="instagram.com"] svg,
+.topbar-ticker a[href*="instagram.com"] svg * {
+    fill: currentColor !important;
+}
+
+/* 2) Footer social buttons — uniform white/cream + clean CSS hover */
+.footer-social-btn {
+    color: #f5efe2 !important;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+.footer-social-btn svg,
+.footer-social-btn svg * {
+    fill: currentColor !important;
+}
+.footer-social-btn:hover,
+.footer-social-btn:focus {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+}
+
+/* 3) Hero slider background image + readability overlay */
+.tento-hero-slider.has-bg-image {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.tento-hero-slider.has-bg-image::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(16, 24, 20, var(--rb-hero-overlay, 0.55));
+    pointer-events: none;
+}
+.tento-hero-slider.has-bg-image .tento-hero-slides,
+.tento-hero-slider.has-bg-image .tento-hero-controls {
+    position: relative;
+    z-index: 2;
+}
+
+/* 4) Newsletter feedback messages */
+.rb-newsletter-msg {
+    font-size: 12px;
+    margin: 6px 0 0;
+    display: none;
+    line-height: 1.8;
+}
+.rb-newsletter-msg.is-visible {
+    display: block;
+}
+.rb-newsletter-msg.is-success {
+    color: #a5d0b9;
+}
+.rb-newsletter-msg.is-error {
+    color: #ffb4a8;
+}

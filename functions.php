@@ -22,6 +22,7 @@ require_once RASHNUBOOK_DIR . '/inc/woocommerce.php';
 require_once RASHNUBOOK_DIR . '/inc/landing-helpers.php';
 require_once RASHNUBOOK_DIR . '/inc/customizer.php';
 require_once RASHNUBOOK_DIR . '/inc/admin-panel.php';
+require_once RASHNUBOOK_DIR . '/inc/theme-fixes.php';
 
 /**
  * Enqueue scripts and styles.
@@ -62,6 +63,14 @@ function rashnubook_scripts() {
         );
     }
 
+    // 4.5 Theme fixes stylesheet (social colors, hero bg, newsletter)
+    wp_enqueue_style(
+        'rashnubook-fixes',
+        RASHNUBOOK_URI . '/assets/css/fixes.css',
+        array('rashnubook-main'),
+        RASHNUBOOK_VERSION
+    );
+
         // 5. Lightweight Vanilla JavaScript (deferred)
     wp_enqueue_script(
         'rashnubook-main-js',
@@ -73,6 +82,7 @@ function rashnubook_scripts() {
 
     wp_localize_script('rashnubook-main-js', 'rashnubook_ajax', array(
         'ajax_url' => admin_url('admin-ajax.php'),
+        'newsletter_nonce' => wp_create_nonce('rashnubook_newsletter'),
     ));
 
     // Threaded comments script
@@ -109,12 +119,20 @@ function rashnubook_ajax_search() {
             $price_str = '';
             $author = '';
 
-            if ($is_product && function_exists('wc_get_product')) {
-                $product = wc_get_product($post_id);
-                if ($product) {
-                    $price_str = $product->get_price_html();
+            if ($is_product) {
+                if (function_exists('wc_get_product')) {
+                    $product = wc_get_product($post_id);
+                    if ($product) {
+                        $price_str = $product->get_price_html();
+                    }
                 }
                 $author = get_post_meta($post_id, '_rashnubook_author', true);
+                if ('' === $author) {
+                    $author = get_post_meta($post_id, '_rashnubook_translator', true);
+                }
+                if ('' === $author) {
+                    $author = get_post_meta($post_id, 'author', true);
+                }
             }
 
             $img_url = get_the_post_thumbnail_url($post_id, 'thumbnail');
@@ -128,7 +146,7 @@ function rashnubook_ajax_search() {
                 'url'       => get_permalink(),
                 'is_book'   => $is_product,
                 'type'      => $is_product ? 'کتاب' : 'یادداشت ادبی',
-                'author'    => $author ? $author : (get_the_author()),
+                'author'    => $is_product ? $author : get_the_author(),
                 'price'     => $price_str,
                 'thumbnail' => $img_url,
             );
@@ -151,4 +169,3 @@ function rashnubook_defer_scripts($tag, $handle, $src) {
     return $tag;
 }
 add_filter('script_loader_tag', 'rashnubook_defer_scripts', 10, 3);
-
