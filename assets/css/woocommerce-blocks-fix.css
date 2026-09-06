@@ -1,0 +1,97 @@
+/* RashnuBook WooCommerce Blocks layout repair */
+body.woocommerce-cart .site-main > .container,
+body.woocommerce-checkout .site-main > .container,
+body.woocommerce-cart .entry-content,
+body.woocommerce-checkout .entry-content {
+  width: 100% !important;
+  max-width: 1240px !important;
+  min-width: 0 !important;
+}
+
+.wp-block-woocommerce-cart,
+.wp-block-woocommerce-checkout,
+.wc-block-cart,
+.wc-block-checkout {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.wp-block-woocommerce-cart,
+.wc-block-cart {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px) !important;
+  gap: 32px !important;
+  align-items: start !important;
+}
+
+.wp-block-woocommerce-checkout,
+.wc-block-checkout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr) !important;
+  gap: 32px !important;
+  align-items: start !important;
+}
+
+.wp-block-woocommerce-cart-items-block,
+.wp-block-woocommerce-cart-order-summary-block,
+.wp-block-woocommerce-checkout-fields-block,
+.wp-block-woocommerce-checkout-totals-block,
+.wc-block-cart__items,
+.wc-block-cart__sidebar,
+.wc-block-checkout__form,
+.wc-block-checkout__sidebar,
+.wc-block-components-main,
+.wc-block-components-sidebar {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.wp-block-woocommerce-cart-items-block,
+.wc-block-cart__items {
+  overflow-x: auto !important;
+}
+
+.wp-block-woocommerce-cart-order-summary-block,
+.wc-block-cart__sidebar,
+.wc-block-components-sidebar,
+.wp-block-woocommerce-checkout-totals-block,
+.wc-block-checkout__sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.wp-block-woocommerce-cart table,
+.wc-block-cart table {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.wp-block-woocommerce-cart td,
+.wp-block-woocommerce-cart th,
+.wc-block-cart td,
+.wc-block-cart th {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 992px) {
+  .wp-block-woocommerce-cart,
+  .wp-block-woocommerce-checkout,
+  .wc-block-cart,
+  .wc-block-checkout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 24px !important;
+  }
+
+  .wp-block-woocommerce-cart-order-summary-block,
+  .wc-block-cart__sidebar,
+  .wc-block-components-sidebar,
+  .wp-block-woocommerce-checkout-totals-block,
+  .wc-block-checkout__sidebar {
+    position: static;
+  }
+}
