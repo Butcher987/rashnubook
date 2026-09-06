@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 function rashnubook_shortcode_landing_hero($atts) {
     $atts = shortcode_atts(array(
         'title'       => 'شاهکار ادبیات قرن بیستم',
-        'subtitle'    => 'فرصتی تکرارنشدنی برای تهیه مجموعه نفیس و نایاب با تخفیف اختصاصی همراه با ارسال رایگان',
+        'subtitle'    => 'فرصتی تکرارنشدنی برای تهیه مجموعه نفیس و نایاب با تخفیف اختصاصی همراه با ارسال پستی',
         'btn_text'    => 'سفارش فوری با ۳۰٪ تخفیف',
         'btn_url'     => '#order',
         'badge'       => 'ویژه اعضای باشگاه خوانندگان',

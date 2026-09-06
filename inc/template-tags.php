@@ -75,8 +75,8 @@ function rashnubook_get_trust_badges() {
     $defaults = array(
         1 => array(
             'icon'  => 'shipping',
-            'title' => 'ارسال سریع و کاملاً رایگان',
-            'desc'  => 'ارسال بدون هزینه پستی به تمام نقاط ایران برای سفارش‌های کتاب',
+            'title' => 'ارسال سریع پستی',
+            'desc'  => 'ارسال با پست پیشتاز و سفارشی به تمام نقاط ایران برای سفارش‌های کتاب',
             'color' => 'var(--primary)',
             'bg'    => 'rgba(27,67,50,0.08)',
         ),
@@ -152,23 +152,36 @@ function rashnubook_get_book_attributes($product_id) {
         'publisher'   => get_post_meta($product_id, '_book_publisher', true),
         'isbn'        => get_post_meta($product_id, '_book_isbn', true),
         'pages'       => get_post_meta($product_id, '_book_pages', true),
-        'edition'     => get_post_meta($product_id, '_book_edition', true),
         'format'      => get_post_meta($product_id, '_book_format', true),
+        'cover'       => get_post_meta($product_id, '_book_cover', true),
+        'edition'     => get_post_meta($product_id, '_book_edition', true),
         'excerpt'     => get_post_meta($product_id, '_book_quote', true),
     );
 
     // Fallback to standard product attributes if custom meta not set
-    if (empty($attributes['author']) && $product->get_attribute('author')) {
-        $attributes['author'] = $product->get_attribute('author');
+    if (empty($attributes['author'])) {
+        $attributes['author'] = $product->get_attribute('author') ?: ($product->get_attribute('نویسنده') ?: $product->get_attribute('پدیدآور'));
     }
-    if (empty($attributes['translator']) && $product->get_attribute('translator')) {
-        $attributes['translator'] = $product->get_attribute('translator');
+    if (empty($attributes['translator'])) {
+        $attributes['translator'] = $product->get_attribute('translator') ?: $product->get_attribute('مترجم');
     }
-    if (empty($attributes['publisher']) && $product->get_attribute('publisher')) {
-        $attributes['publisher'] = $product->get_attribute('publisher');
+    if (empty($attributes['publisher'])) {
+        $attributes['publisher'] = $product->get_attribute('publisher') ?: $product->get_attribute('ناشر');
     }
-    if (empty($attributes['isbn']) && $product->get_attribute('isbn')) {
-        $attributes['isbn'] = $product->get_attribute('isbn');
+    if (empty($attributes['isbn'])) {
+        $attributes['isbn'] = $product->get_attribute('isbn') ?: ($product->get_attribute('شابک') ?: $product->get_attribute('شابك'));
+    }
+    if (empty($attributes['pages'])) {
+        $attributes['pages'] = $product->get_attribute('pages') ?: ($product->get_attribute('تعداد صفحات') ?: ($product->get_attribute('صفحات') ?: $product->get_attribute('صفحه')));
+    }
+    if (empty($attributes['format'])) {
+        $attributes['format'] = $product->get_attribute('format') ?: ($product->get_attribute('قطع') ?: $product->get_attribute('قطع کتاب'));
+    }
+    if (empty($attributes['cover'])) {
+        $attributes['cover'] = $product->get_attribute('cover') ?: ($product->get_attribute('نوع جلد') ?: $product->get_attribute('جلد'));
+    }
+    if (empty($attributes['edition'])) {
+        $attributes['edition'] = $product->get_attribute('edition') ?: ($product->get_attribute('نوبت چاپ') ?: ($product->get_attribute('چاپ') ?: $product->get_attribute('سال چاپ')));
     }
 
     return $attributes;
@@ -224,7 +237,7 @@ function rashnubook_render_3d_book_mockup($args = array()) {
                             </div>
                             <div style="border-top:1px solid rgba(255,255,255,0.15); padding-top:8px; display:flex; justify-content:space-between; font-size:11px; opacity:0.85;">
                                 <span><?php echo esc_html($publisher); ?></span>
-                                <span>ارسال رایگان</span>
+                                <span>ارسال پستی</span>
                             </div>
                         </div>
                     </div>
@@ -244,4 +257,250 @@ function rashnubook_render_3d_book_mockup($args = array()) {
     </div>
     <?php
 }
+
+/**
+ * Render dynamic footer link columns (پیوندهای مهم و موضوعات برگزیده)
+ */
+function rashnubook_render_footer_column($col_key, $default_title, $default_links = array()) {
+    $enable = rashnubook_get_option("footer_{$col_key}_enable", '1') !== '0';
+    if (!$enable) {
+        return;
+    }
+
+    $title = rashnubook_get_option("footer_{$col_key}_title", $default_title);
+    $menu_loc = ($col_key === 'col2') ? 'footer_links' : (($col_key === 'col3') ? 'footer_categories' : '');
+
+    echo '<div class="footer-col">';
+    echo '<h4>' . esc_html($title) . '</h4>';
+
+    if ($menu_loc && has_nav_menu($menu_loc)) {
+        wp_nav_menu(array(
+            'theme_location' => $menu_loc,
+            'container'      => false,
+            'menu_class'     => 'footer-links',
+            'fallback_cb'    => false,
+        ));
+    } else {
+        $custom_text = rashnubook_get_option("footer_{$col_key}_links", '');
+        $links = array();
+        if (!empty(trim($custom_text))) {
+            $lines = explode("\n", $custom_text);
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) continue;
+                $parts = explode('|', $line, 2);
+                $link_title = trim($parts[0] ?? '');
+                $link_url   = trim($parts[1] ?? '#');
+                if ($link_title) {
+                    $links[] = array('title' => $link_title, 'url' => $link_url);
+                }
+            }
+        } else {
+            $links = $default_links;
+        }
+
+        if (!empty($links)) {
+            echo '<ul class="footer-links">';
+            foreach ($links as $lnk) {
+                $url = $lnk['url'];
+                if (strpos($url, 'http') !== 0 && strpos($url, '/') === 0) {
+                    $url = home_url($url);
+                }
+                echo '<li><a href="' . esc_url($url) . '">' . esc_html($lnk['title']) . '</a></li>';
+            }
+            echo '</ul>';
+        }
+    }
+
+    echo '</div>';
+}
+
+/**
+ * Render Header Category Dropdown Menu
+ * Powered by 'category' navigation menu location or live WooCommerce product categories
+ */
+function rashnubook_render_header_category_dropdown() {
+    if (has_nav_menu('category')) {
+        wp_nav_menu(array(
+            'theme_location' => 'category',
+            'container'      => false,
+            'menu_class'     => 'category-dropdown-list',
+            'fallback_cb'    => false,
+            'depth'          => 3,
+        ));
+    } else {
+        $cats = array();
+        if (class_exists('WooCommerce')) {
+            $cats = get_terms(array(
+                'taxonomy'   => 'product_cat',
+                'hide_empty' => false,
+                'parent'     => 0,
+                'number'     => 8,
+                'exclude'    => array((int)get_option('default_product_cat', 0)),
+            ));
+        }
+
+        echo '<ul class="category-dropdown-list">';
+        if (!empty($cats) && !is_wp_error($cats)) {
+            foreach ($cats as $cat) {
+                echo '<li class="cat-dropdown-item">';
+                echo '<a href="' . esc_url(get_term_link($cat)) . '">';
+                echo '<span>' . esc_html($cat->name) . '</span>';
+                if ($cat->count > 0) {
+                    echo '<span class="cat-count-badge">' . esc_html(rashnubook_to_persian_numbers($cat->count)) . '</span>';
+                }
+                echo '</a>';
+                echo '</li>';
+            }
+        } else {
+            echo '<li class="cat-dropdown-empty"><span style="padding:10px 16px; display:block; color:#777; font-size:12.5px;">' . esc_html__('فهرست دسته‌ها را از نمایش > فهرست‌ها تنظیم کنید.', 'rashnubook') . '</span></li>';
+        }
+        echo '<li class="cat-dropdown-all"><a href="' . esc_url(home_url('/categories/')) . '"><span>' . esc_html__('مشاهده تمامی موضوعات و دسته‌ها', 'rashnubook') . '</span><span class="cat-arrow">‹</span></a></li>';
+        echo '</ul>';
+    }
+}
+
+/**
+ * Render Mobile Drawer Category Menu
+ * Powered by 'category' navigation menu location or live WooCommerce product categories
+ */
+function rashnubook_render_drawer_category_menu() {
+    if (has_nav_menu('category')) {
+        wp_nav_menu(array(
+            'theme_location' => 'category',
+            'container'      => false,
+            'menu_class'     => 'drawer-cat-menu-list',
+            'fallback_cb'    => false,
+            'depth'          => 2,
+        ));
+    } else {
+        $live_cats = array();
+        if (class_exists('WooCommerce')) {
+            $live_cats = get_terms(array(
+                'taxonomy'   => 'product_cat',
+                'hide_empty' => false,
+                'parent'     => 0,
+                'number'     => 8,
+                'exclude'    => array((int)get_option('default_product_cat', 0)),
+            ));
+        }
+
+        if (!empty($live_cats) && !is_wp_error($live_cats)) {
+            $palette = array('#1F4D3A', '#A56A4A', '#3B2F2F', '#7C8B6A', '#854f34', '#b83b26', '#2D231E');
+            $ci = 0;
+            echo '<div class="drawer-cat-list">';
+            foreach ($live_cats as $lcat) {
+                if ($lcat->slug === 'uncategorized' || $lcat->slug === 'dast-bandy-nshdh') {
+                    continue;
+                }
+                $dot_col = $palette[$ci % count($palette)];
+                $ci++;
+                echo '<a href="' . esc_url(get_term_link($lcat)) . '" class="drawer-cat-item">';
+                echo '<span class="drawer-cat-dot" style="background:' . esc_attr($dot_col) . ';"></span>';
+                echo '<span class="drawer-cat-name">' . esc_html($lcat->name) . '</span>';
+                if ($lcat->count > 0) {
+                    echo '<span class="drawer-cat-badge">' . esc_html(rashnubook_to_persian_numbers($lcat->count)) . '</span>';
+                }
+                echo '</a>';
+            }
+            echo '</div>';
+        }
+    }
+}
+
+/**
+ * Get active homepage category cards
+ * Synchronized with WordPress Menus ('category' location) or fallback to real WooCommerce categories
+ */
+function rashnubook_get_active_category_cards() {
+    $cards = array();
+
+    // 1. Check if user configured a 'category' menu in Appearance > Menus
+    if (has_nav_menu('category')) {
+        $locations = get_nav_menu_locations();
+        $menu_id   = $locations['category'] ?? 0;
+        if ($menu_id) {
+            $menu_items = wp_get_nav_menu_items($menu_id);
+            if (!empty($menu_items)) {
+                $icon_palette = array('book', 'feather', 'star', 'heart', 'user', 'bookmark');
+                $card_idx = 0;
+                foreach ($menu_items as $item) {
+                    if ((int)$item->menu_item_parent !== 0) {
+                        continue; // Top level items only
+                    }
+                    $count_str = '';
+                    if ($item->object === 'product_cat') {
+                        $term = get_term($item->object_id, 'product_cat');
+                        if ($term && !is_wp_error($term) && $term->count > 0) {
+                            $count_str = rashnubook_to_persian_numbers($term->count) . ' عنوان کتاب';
+                        }
+                    }
+                    $cards[] = array(
+                        'enabled' => true,
+                        'slug'    => '',
+                        'title'   => $item->title,
+                        'url'     => $item->url,
+                        'icon'    => $icon_palette[$card_idx % count($icon_palette)],
+                        'count'   => $count_str,
+                    );
+                    $card_idx++;
+                    if ($card_idx >= 5) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // 2. If no menu items, check configured admin panel cards or live WooCommerce categories
+    if (empty($cards) && function_exists('rashnubook_get_homepage_category_cards')) {
+        $admin_cards = rashnubook_get_homepage_category_cards();
+        $filtered    = array_filter($admin_cards, static fn($c) => !empty($c['enabled']));
+
+        $has_real_term = false;
+        if (class_exists('WooCommerce')) {
+            foreach ($filtered as $fc) {
+                if (!empty($fc['slug']) && term_exists($fc['slug'], 'product_cat')) {
+                    $has_real_term = true;
+                    break;
+                }
+            }
+        }
+
+        if ($has_real_term || !class_exists('WooCommerce')) {
+            $cards = $filtered;
+        } else {
+            // Automatically populate from real WooCommerce product categories
+            $live_terms = get_terms(array(
+                'taxonomy'   => 'product_cat',
+                'hide_empty' => false,
+                'parent'     => 0,
+                'number'     => 5,
+                'exclude'    => array((int)get_option('default_product_cat', 0)),
+            ));
+
+            if (!empty($live_terms) && !is_wp_error($live_terms)) {
+                $icon_palette = array('book', 'feather', 'star', 'heart', 'user');
+                $i = 0;
+                foreach ($live_terms as $lt) {
+                    $cards[] = array(
+                        'enabled' => true,
+                        'slug'    => $lt->slug,
+                        'title'   => $lt->name,
+                        'url'     => get_term_link($lt),
+                        'icon'    => $icon_palette[$i % count($icon_palette)],
+                        'count'   => ($lt->count > 0) ? rashnubook_to_persian_numbers($lt->count) . ' عنوان کتاب' : '',
+                    );
+                    $i++;
+                }
+            } else {
+                $cards = $filtered;
+            }
+        }
+    }
+
+    return $cards;
+}
+
+
 

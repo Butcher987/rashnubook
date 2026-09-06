@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('RASHNUBOOK_VERSION', '1.0.3');
+define('RASHNUBOOK_VERSION', '1.3.0');
 define('RASHNUBOOK_DIR', get_template_directory());
 define('RASHNUBOOK_URI', get_template_directory_uri());
 
@@ -73,6 +73,7 @@ function rashnubook_scripts() {
 
     wp_localize_script('rashnubook-main-js', 'rashnubook_ajax', array(
         'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce'    => wp_create_nonce('rashnubook_ajax_nonce'),
     ));
 
     // Threaded comments script
@@ -113,8 +114,23 @@ function rashnubook_ajax_search() {
                 $product = wc_get_product($post_id);
                 if ($product) {
                     $price_str = $product->get_price_html();
+                    $author = get_post_meta($post_id, '_book_author', true);
+                    if (empty($author)) {
+                        $author = get_post_meta($post_id, '_rashnubook_author', true);
+                    }
+                    if (empty($author) && method_exists($product, 'get_attribute')) {
+                        $author = $product->get_attribute('author') ?: $product->get_attribute('نویسنده');
+                    }
+                    if (empty($author)) {
+                        $pub = get_post_meta($post_id, '_book_publisher', true);
+                        if (!empty($pub)) {
+                            $author = 'نشر: ' . $pub;
+                        }
+                    }
                 }
-                $author = get_post_meta($post_id, '_rashnubook_author', true);
+                // Never fallback to get_the_author() (WordPress user) for books
+            } else {
+                $author = get_the_author();
             }
 
             $img_url = get_the_post_thumbnail_url($post_id, 'thumbnail');
@@ -128,7 +144,7 @@ function rashnubook_ajax_search() {
                 'url'       => get_permalink(),
                 'is_book'   => $is_product,
                 'type'      => $is_product ? 'کتاب' : 'یادداشت ادبی',
-                'author'    => $author ? $author : (get_the_author()),
+                'author'    => $author,
                 'price'     => $price_str,
                 'thumbnail' => $img_url,
             );
@@ -140,6 +156,74 @@ function rashnubook_ajax_search() {
 }
 add_action('wp_ajax_rashnubook_ajax_search', 'rashnubook_ajax_search');
 add_action('wp_ajax_nopriv_rashnubook_ajax_search', 'rashnubook_ajax_search');
+
+/**
+ * Ajax Newsletter Subscription Handler
+ */
+function rashnubook_ajax_newsletter_signup() {
+    check_ajax_referer('rashnubook_ajax_nonce', 'nonce');
+
+    $email = isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : '';
+
+    if (empty($email) || !is_email($email)) {
+        wp_send_json_error(array('message' => 'لطفاً یک نشانی ایمیل معتبر وارد فرمایید.'));
+    }
+
+    $subscribers = get_option('rashnubook_newsletter_subscribers', array());
+    if (!is_array($subscribers)) {
+        $subscribers = array();
+    }
+
+    // Check if already subscribed
+    foreach ($subscribers as $sub) {
+        if (isset($sub['email']) && strtolower($sub['email']) === strtolower($email)) {
+            wp_send_json_success(array('message' => 'نشانی ایمیل شما قبلاً در خبرنامه ثبت شده است. سپاس از همراهی شما!'));
+        }
+    }
+
+    $subscribers[] = array(
+        'email' => $email,
+        'date'  => current_time('mysql'),
+        'ip'    => sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? ''),
+    );
+
+    update_option('rashnubook_newsletter_subscribers', $subscribers);
+
+    wp_send_json_success(array('message' => 'عضویت شما در خبرنامه با موفقیت ثبت شد. از همراهی شما متشکریم!'));
+}
+add_action('wp_ajax_rashnubook_newsletter_signup', 'rashnubook_ajax_newsletter_signup');
+add_action('wp_ajax_nopriv_rashnubook_newsletter_signup', 'rashnubook_ajax_newsletter_signup');
+
+/**
+ * Virtual route / template loader for /categories/ and /blog/
+ */
+function rashnubook_template_virtual_routes() {
+    $req = trim($_SERVER['REQUEST_URI'] ?? '', '/');
+    $req_path = parse_url($req, PHP_URL_PATH);
+    $req_path = trim((string)$req_path, '/');
+
+    // Categories page
+    if ($req_path === 'categories' || preg_match('/(^|\/)categories$/', $req_path) || get_query_var('pagename') === 'categories') {
+        $template = locate_template('page-categories.php');
+        if ($template) {
+            status_header(200);
+            include $template;
+            exit;
+        }
+    }
+
+    // Blog / Articles archive
+    if ($req_path === 'blog' || preg_match('/(^|\/)blog$/', $req_path) || get_query_var('pagename') === 'blog' || (isset($_GET['post_type']) && $_GET['post_type'] === 'post')) {
+        $template = locate_template('home.php');
+        if ($template) {
+            status_header(200);
+            include $template;
+            exit;
+        }
+    }
+}
+add_action('template_redirect', 'rashnubook_template_virtual_routes', 5);
+
 
 /**
  * Add defer attribute to theme script for faster loading

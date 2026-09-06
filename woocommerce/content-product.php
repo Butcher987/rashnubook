@@ -21,6 +21,13 @@ $publisher = get_post_meta($product_id, '_book_publisher', true);
 $edition = get_post_meta($product_id, '_book_edition', true);
 $quote = get_post_meta($product_id, '_book_quote', true);
 
+if (empty($author) && method_exists($product, 'get_attribute')) {
+    $author = $product->get_attribute('author') ?: $product->get_attribute('نویسنده');
+}
+if (empty($publisher) && method_exists($product, 'get_attribute')) {
+    $publisher = $product->get_attribute('publisher') ?: $product->get_attribute('ناشر');
+}
+
 // Get primary category for color coding
 $terms = get_the_terms($product_id, 'product_cat');
 $cat_slug = !empty($terms) && !is_wp_error($terms) ? $terms[0]->slug : 'fiction';
@@ -92,7 +99,7 @@ if ($product->is_on_sale() && $product->get_regular_price() && $product->get_sal
     <!-- Book Details -->
     <div class="rb-card-details">
         <div class="rb-card-meta">
-            <?php echo esc_html($author ? $author : ($publisher ? $publisher : 'کتابفروشی آنلاین رَشن')); ?>
+            <?php echo esc_html($author ? $author : ($publisher ? 'نشر: ' . $publisher : '')); ?>
         </div>
 
         <h3 class="rb-card-title">
@@ -108,9 +115,22 @@ if ($product->is_on_sale() && $product->get_regular_price() && $product->get_sal
 
         <!-- Buy Button -->
         <div class="rb-card-actions">
-            <a href="<?php the_permalink(); ?>" class="rb-btn-buy">
+            <?php
+            $is_purchasable_simple = $product->is_purchasable() && $product->is_in_stock() && $product->is_type('simple');
+            $buy_url               = $is_purchasable_simple ? esc_url($product->add_to_cart_url()) : esc_url(get_permalink());
+            $buy_classes           = 'rb-btn-buy';
+            if ($is_purchasable_simple) {
+                $buy_classes .= ' add_to_cart_button ajax_add_to_cart product_type_simple';
+            }
+            ?>
+            <a href="<?php echo $buy_url; ?>" 
+               class="<?php echo esc_attr($buy_classes); ?>"
+               data-product_id="<?php echo esc_attr($product->get_id()); ?>"
+               data-product_sku="<?php echo esc_attr($product->get_sku()); ?>"
+               aria-label="<?php echo esc_attr($product->add_to_cart_description()); ?>"
+               rel="nofollow">
                 <?php rashnubook_icon('cart'); ?>
-                <span>خرید کتاب</span>
+                <span><?php echo esc_html($product->add_to_cart_text()); ?></span>
             </a>
         </div>
     </div>

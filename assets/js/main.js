@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroSlider();
   initProductCarousels();
   initAjaxSearch();
+  initNewsletter();
+  initCategoryDropdown();
 });
 
 /**
@@ -411,3 +413,104 @@ function initAjaxSearch() {
 
 
 
+
+
+/**
+ * Newsletter AJAX Signup
+ */
+function initNewsletter() {
+  const form = document.getElementById('rashnu-newsletter-form');
+  const emailInput = document.getElementById('rashnu-newsletter-email');
+  const submitBtn = document.getElementById('rashnu-newsletter-submit');
+  const msgBox = document.getElementById('rashnu-newsletter-msg');
+
+  if (!form || !emailInput || !submitBtn || !msgBox) return;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+    if (!email) return;
+
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '...';
+    msgBox.style.display = 'none';
+
+    const ajaxUrl = (typeof rashnubook_ajax !== 'undefined' && rashnubook_ajax.ajax_url)
+      ? rashnubook_ajax.ajax_url
+      : '/rashnubook/wp-admin/admin-ajax.php';
+    const nonce = (typeof rashnubook_ajax !== 'undefined' && rashnubook_ajax.nonce)
+      ? rashnubook_ajax.nonce
+      : '';
+
+    const formData = new FormData();
+    formData.append('action', 'rashnubook_newsletter_signup');
+    formData.append('email', email);
+    formData.append('nonce', nonce);
+
+    fetch(ajaxUrl, {
+      method: 'POST',
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        msgBox.style.display = 'block';
+
+        if (res.success) {
+          msgBox.style.background = 'rgba(74, 222, 128, 0.15)';
+          msgBox.style.color = '#86efac';
+          msgBox.style.border = '1px solid rgba(74, 222, 128, 0.3)';
+          msgBox.textContent = res.data && res.data.message ? res.data.message : 'عضویت شما با موفقیت ثبت شد.';
+          emailInput.value = '';
+        } else {
+          msgBox.style.background = 'rgba(239, 68, 68, 0.15)';
+          msgBox.style.color = '#fca5a5';
+          msgBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+          msgBox.textContent = res.data && res.data.message ? res.data.message : 'خطایی رخ داد. لطفاً مجدداً تلاش کنید.';
+        }
+      })
+      .catch(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        msgBox.style.display = 'block';
+        msgBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        msgBox.style.color = '#fca5a5';
+        msgBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+        msgBox.textContent = 'خطا در برقراری ارتباط با سرور.';
+      });
+  });
+}
+
+/**
+ * Header Category Mega Dropdown (Accessibility & Click Outside)
+ */
+function initCategoryDropdown() {
+  const dropdown = document.getElementById('nav-cat-dropdown');
+  const btn = document.getElementById('nav-cat-btn');
+  const menu = document.getElementById('nav-cat-menu');
+
+  if (!dropdown || !btn || !menu) return;
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target)) {
+      dropdown.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dropdown.classList.contains('is-open')) {
+      dropdown.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.focus();
+    }
+  });
+}

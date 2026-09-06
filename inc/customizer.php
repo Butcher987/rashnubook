@@ -18,7 +18,7 @@ function rashnubook_customize_register($wp_customize) {
 
     // Topbar announcement
     $wp_customize->add_setting('rashnubook_topbar_text', array(
-        'default'           => 'ارسال رایگان برای خریدهای بالای ۵۰۰ هزار تومان در سراسر کشور',
+        'default'           => 'ارسال سریع پستی کتاب به سراسر کشور | اینستاگرام: rashno_book@',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     $wp_customize->add_control('rashnubook_topbar_text', array(

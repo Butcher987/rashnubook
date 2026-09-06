@@ -28,10 +28,12 @@ if (!function_exists('rashnubook_setup')) {
 
         // Register navigation menus
         register_nav_menus(array(
-            'primary'   => esc_html__('منوی اصلی سربرگ', 'rashnubook'),
-            'category'  => esc_html__('منوی موضوعات و دسته‌بندی‌ها', 'rashnubook'),
-            'mobile'    => esc_html__('منوی موبایل', 'rashnubook'),
-            'footer'    => esc_html__('منوی فوتر', 'rashnubook'),
+            'primary'           => esc_html__('منوی اصلی سربرگ (پیوندهای اصلی سایت)', 'rashnubook'),
+            'category'          => esc_html__('منوی دسته‌بندی‌های کتاب (آبشاری سربرگ، کشوی موبایل و ویترین)', 'rashnubook'),
+            'mobile'            => esc_html__('منوی پیوندهای موبایل (جایگزین منوی اصلی در موبایل)', 'rashnubook'),
+            'footer_categories' => esc_html__('فوتر: ستون ۳ (موضوعات برگزیده و دسته‌ها)', 'rashnubook'),
+            'footer_links'      => esc_html__('فوتر: ستون ۲ (پیوندهای مهم)', 'rashnubook'),
+            'footer'            => esc_html__('منوی فوتر (عمومی)', 'rashnubook'),
         ));
 
         // Switch default core markup for search form, comment form, and comments to output valid HTML5

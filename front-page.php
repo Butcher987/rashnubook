@@ -48,81 +48,97 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
             }
             $active_slides = array_values($active_slides);
             $total_active = count($active_slides);
+            $hero_slider_bg = rashnubook_get_option('hero_slider_bg', '');
+            $slider_style   = $hero_slider_bg ? 'background-image: linear-gradient(135deg, rgba(18, 43, 32, 0.92) 0%, rgba(31, 77, 58, 0.88) 100%), url(' . esc_url($hero_slider_bg) . '); background-size: cover; background-position: center;' : '';
         ?>
-            <section class="tento-hero-slider" data-hero-slider data-autoplay="<?php echo esc_attr($hero_autoplay); ?>" data-interval="<?php echo esc_attr($hero_interval); ?>" role="region" aria-label="<?php esc_attr_e('اسلایدر معرفی کتاب‌های برگزیده', 'rashnubook'); ?>">
+            <section class="tento-hero-slider" data-hero-slider data-autoplay="<?php echo esc_attr($hero_autoplay); ?>" data-interval="<?php echo esc_attr($hero_interval); ?>" role="region" aria-label="<?php esc_attr_e('اسلایدر معرفی کتاب‌های برگزیده', 'rashnubook'); ?>" style="<?php echo esc_attr($slider_style); ?>">
                 <div class="tento-hero-slides">
                     <?php foreach ($active_slides as $index => $slide) :
-                        $is_first = ($index === 0);
-                        $buy_url = !empty($slide['btn1_url']) ? $slide['btn1_url'] : $shop_url;
+                        $is_first    = ($index === 0);
+                        $buy_url     = !empty($slide['btn1_url']) ? $slide['btn1_url'] : $shop_url;
+                        $slide_type  = !empty($slide['slide_type']) ? $slide['slide_type'] : 'content';
+                        $bg_image    = !empty($slide['bg_image']) ? $slide['bg_image'] : '';
+                        $banner_img  = !empty($slide['banner_image']) ? $slide['banner_image'] : '';
+                        $banner_link = !empty($slide['banner_link']) ? $slide['banner_link'] : $buy_url;
                     ?>
-                        <article class="tento-hero-slide <?php echo $is_first ? 'is-active' : ''; ?>" data-hero-slide aria-hidden="<?php echo $is_first ? 'false' : 'true'; ?>">
-                            <div class="tento-hero-grid">
-                                <div class="tento-hero-info">
-                                    <?php if (!empty($slide['badge'])) : ?>
-                                        <span class="tento-hero-badge">
-                                            <?php rashnubook_icon('star'); ?>
-                                            <span><?php echo esc_html($slide['badge']); ?></span>
-                                        </span>
-                                    <?php endif; ?>
+                        <?php if ($slide_type === 'banner' && !empty($banner_img)) : ?>
+                            <article class="tento-hero-slide tento-slide-banner <?php echo $is_first ? 'is-active' : ''; ?>" data-hero-slide aria-hidden="<?php echo $is_first ? 'false' : 'true'; ?>">
+                                <a href="<?php echo esc_url($banner_link); ?>" class="tento-hero-banner-link" style="display:block; width:100%; height:100%; min-height:420px; overflow:hidden;">
+                                    <img src="<?php echo esc_url($banner_img); ?>" alt="<?php echo esc_attr($slide['title']); ?>" style="width:100%; height:100%; object-fit:cover; display:block;">
+                                </a>
+                            </article>
+                        <?php else :
+                            $slide_bg_style = $bg_image ? 'background-image: linear-gradient(135deg, rgba(18, 43, 32, 0.90) 0%, rgba(31, 77, 58, 0.85) 100%), url(' . esc_url($bg_image) . '); background-size: cover; background-position: center;' : '';
+                        ?>
+                            <article class="tento-hero-slide <?php echo $is_first ? 'is-active' : ''; ?> <?php echo $bg_image ? 'has-bg-image' : ''; ?>" data-hero-slide aria-hidden="<?php echo $is_first ? 'false' : 'true'; ?>" style="<?php echo esc_attr($slide_bg_style); ?>">
+                                <div class="tento-hero-grid">
+                                    <div class="tento-hero-info">
+                                        <?php if (!empty($slide['badge'])) : ?>
+                                            <span class="tento-hero-badge">
+                                                <?php rashnubook_icon('star'); ?>
+                                                <span><?php echo esc_html($slide['badge']); ?></span>
+                                            </span>
+                                        <?php endif; ?>
 
-                                    <h1 class="tento-hero-title"><?php echo esc_html($slide['title']); ?></h1>
+                                        <h1 class="tento-hero-title"><?php echo esc_html($slide['title']); ?></h1>
 
-                                    <?php if (!empty($slide['meta'])) : ?>
-                                        <p class="tento-hero-meta"><?php echo esc_html($slide['meta']); ?></p>
-                                    <?php endif; ?>
+                                        <?php if (!empty($slide['meta'])) : ?>
+                                            <p class="tento-hero-meta"><?php echo esc_html($slide['meta']); ?></p>
+                                        <?php endif; ?>
 
-                                    <?php if (!empty($slide['desc'])) : ?>
-                                        <p class="tento-hero-desc"><?php echo esc_html($slide['desc']); ?></p>
-                                    <?php endif; ?>
+                                        <?php if (!empty($slide['desc'])) : ?>
+                                            <p class="tento-hero-desc"><?php echo esc_html($slide['desc']); ?></p>
+                                        <?php endif; ?>
 
-                                    <?php if (!empty($slide['price'])) : ?>
-                                        <div class="tento-hero-price-wrap">
-                                            <?php if (!empty($slide['old_price']) && (float)$slide['old_price'] > (float)$slide['price']) : ?>
-                                                <span class="tento-hero-old-price"><?php echo esc_html(rashnubook_to_persian_numbers($slide['old_price'])); ?> تومان</span>
+                                        <?php if (!empty($slide['price'])) : ?>
+                                            <div class="tento-hero-price-wrap">
+                                                <?php if (!empty($slide['old_price']) && (float)$slide['old_price'] > (float)$slide['price']) : ?>
+                                                    <span class="tento-hero-old-price"><?php echo esc_html(rashnubook_to_persian_numbers($slide['old_price'])); ?> تومان</span>
+                                                <?php endif; ?>
+                                                <span class="tento-hero-price"><?php echo esc_html(rashnubook_to_persian_numbers($slide['price'])); ?> تومان</span>
+                                                <?php if (!empty($slide['discount'])) : ?>
+                                                    <span class="tento-hero-discount-badge"><?php echo esc_html(rashnubook_to_persian_numbers($slide['discount'])); ?>٪ تخفیف ویژه</span>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <div class="tento-hero-actions">
+                                            <?php if (!empty($slide['btn1_text'])) : ?>
+                                                <a href="<?php echo esc_url($buy_url); ?>" class="tento-btn-primary">
+                                                    <?php rashnubook_icon('cart'); ?>
+                                                    <span><?php echo esc_html($slide['btn1_text']); ?></span>
+                                                </a>
                                             <?php endif; ?>
-                                            <span class="tento-hero-price"><?php echo esc_html(rashnubook_to_persian_numbers($slide['price'])); ?> تومان</span>
-                                            <?php if (!empty($slide['discount'])) : ?>
-                                                <span class="tento-hero-discount-badge"><?php echo esc_html(rashnubook_to_persian_numbers($slide['discount'])); ?>٪ تخفیف ویژه</span>
+
+                                            <?php if (!empty($slide['btn2_text']) && !empty($slide['btn2_url'])) : ?>
+                                                <a href="<?php echo esc_url($slide['btn2_url']); ?>" class="tento-btn-secondary">
+                                                    <span><?php echo esc_html($slide['btn2_text']); ?></span>
+                                                </a>
                                             <?php endif; ?>
                                         </div>
-                                    <?php endif; ?>
+                                    </div>
 
-                                    <div class="tento-hero-actions">
-                                        <?php if (!empty($slide['btn1_text'])) : ?>
-                                            <a href="<?php echo esc_url($buy_url); ?>" class="tento-btn-primary">
-                                                <?php rashnubook_icon('cart'); ?>
-                                                <span><?php echo esc_html($slide['btn1_text']); ?></span>
-                                            </a>
-                                        <?php endif; ?>
-
-                                        <?php if (!empty($slide['btn2_text']) && !empty($slide['btn2_url'])) : ?>
-                                            <a href="<?php echo esc_url($slide['btn2_url']); ?>" class="tento-btn-secondary">
-                                                <span><?php echo esc_html($slide['btn2_text']); ?></span>
-                                            </a>
-                                        <?php endif; ?>
+                                    <div class="tento-hero-visual">
+                                        <?php
+                                        if (function_exists('rashnubook_render_3d_book_mockup')) {
+                                            rashnubook_render_3d_book_mockup(array(
+                                                'cover_id'    => $slide['cover_id'] ?? 0,
+                                                'custom_url'  => $slide['custom_image'] ?? '',
+                                                'title'       => $slide['title'],
+                                                'author'      => $slide['meta'],
+                                                'bg_gradient' => $slide['bg_gradient'] ?? 'linear-gradient(135deg, #1F4D3A 0%, #153628 100%)',
+                                                'spine_color' => $slide['spine_color'] ?? '#142c20',
+                                                'edition'     => $slide['edition'] ?? 'چاپ نفیس',
+                                                'pages'       => $slide['pages'] ?? '',
+                                                'publisher'   => $slide['publisher'] ?? 'کتابفروشی آنلاین رَشن',
+                                                'link'        => $buy_url,
+                                            ));
+                                        }
+                                        ?>
                                     </div>
                                 </div>
-
-                                <div class="tento-hero-visual">
-                                    <?php
-                                    if (function_exists('rashnubook_render_3d_book_mockup')) {
-                                        rashnubook_render_3d_book_mockup(array(
-                                            'cover_id'    => $slide['cover_id'] ?? 0,
-                                            'custom_url'  => $slide['custom_image'] ?? '',
-                                            'title'       => $slide['title'],
-                                            'author'      => $slide['meta'],
-                                            'bg_gradient' => $slide['bg_gradient'] ?? 'linear-gradient(135deg, #1F4D3A 0%, #153628 100%)',
-                                            'spine_color' => $slide['spine_color'] ?? '#142c20',
-                                            'edition'     => $slide['edition'] ?? 'چاپ نفیس',
-                                            'pages'       => $slide['pages'] ?? '',
-                                            'publisher'   => $slide['publisher'] ?? 'کتابفروشی آنلاین رَشن',
-                                            'link'        => $buy_url,
-                                        ));
-                                    }
-                                    ?>
-                                </div>
-                            </div>
-                        </article>
+                            </article>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
 
@@ -152,8 +168,7 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
             if (empty($cats_link_u)) {
                 $cats_link_u = $shop_url;
             }
-            $cat_cards = function_exists('rashnubook_get_homepage_category_cards') ? rashnubook_get_homepage_category_cards() : array();
-            $active_cards = array_filter($cat_cards, static fn($c) => !empty($c['enabled']));
+            $active_cards = function_exists('rashnubook_get_active_category_cards') ? rashnubook_get_active_category_cards() : array();
         ?>
             <section class="tento-cat-section" id="categories" aria-label="<?php esc_attr_e('دسته‌بندی‌های کتاب', 'rashnubook'); ?>">
                 <div class="tento-section-header">
@@ -170,7 +185,7 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
 
                 <div class="tento-cat-grid">
                     <?php foreach ($active_cards as $ccard) :
-                        $card_url = add_query_arg('product_cat', $ccard['slug'], $shop_url);
+                        $card_url = !empty($ccard['url']) ? $ccard['url'] : (!empty($ccard['slug']) ? add_query_arg('product_cat', $ccard['slug'], $shop_url) : $shop_url);
                     ?>
                         <a href="<?php echo esc_url($card_url); ?>" class="tento-cat-card">
                             <div class="tento-cat-icon">
@@ -194,10 +209,13 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
             $active_rails = array_filter($rails, static fn($r) => !empty($r['enabled']));
 
             foreach ($active_rails as $rail) :
-                $r_cat   = !empty($rail['cat']) ? $rail['cat'] : '';
-                $r_count = !empty($rail['count']) ? (int)$rail['count'] : 10;
+                $r_cat   = !empty($rail['cat']) ? trim($rail['cat']) : '';
+                $r_count = !empty($rail['count']) ? (int)$rail['count'] : 8;
+                if ($r_count <= 0 || $r_count > 8) {
+                    $r_count = 8;
+                }
                 $r_order = !empty($rail['orderby']) ? $rail['orderby'] : 'date';
-                $r_link  = !empty($rail['link_url']) ? $rail['link_url'] : ($r_cat ? add_query_arg('product_cat', $r_cat, $shop_url) : $shop_url);
+                $r_link  = !empty($rail['link_url']) ? $rail['link_url'] : ($r_cat ? add_query_arg('product_cat', rawurlencode(urldecode($r_cat)), $shop_url) : $shop_url);
                 $r_text  = !empty($rail['link_text']) ? $rail['link_text'] : 'مشاهده همه';
             ?>
                 <section class="lg-category-rail" data-product-rail data-interval="3000" aria-label="<?php echo esc_attr($rail['title']); ?>">
@@ -210,12 +228,16 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
                         </div>
                         <div class="lg-category-rail__actions">
                             <a href="<?php echo esc_url($r_link); ?>" class="rail-link-all"><?php echo esc_html($r_text); ?></a>
+                            <button type="button" data-rail-prev aria-label="محصول قبلی">‹</button>
+                            <button type="button" data-rail-next aria-label="محصول بعدی">›</button>
                         </div>
                     </div>
                     <div class="lg-category-rail__track" data-rail-track>
                         <?php
                         if (!empty($r_cat)) {
-                            echo do_shortcode(sprintf('[products category="%s" limit="%d" orderby="%s" columns="4"]', esc_attr($r_cat), $r_count, esc_attr($r_order)));
+                            // Support both slug format and decode for Persian WooCommerce slugs
+                            $r_cat_clean = urldecode($r_cat);
+                            echo do_shortcode(sprintf('[products category="%s" limit="%d" orderby="%s" columns="4"]', esc_attr($r_cat_clean), $r_count, esc_attr($r_order)));
                         } else {
                             echo do_shortcode(sprintf('[products limit="%d" orderby="%s" columns="4"]', $r_count, esc_attr($r_order)));
                         }
@@ -252,6 +274,8 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
             $b_card_t    = rashnubook_get_option('home_banner_card_title', 'آفتابگردان');
             $b_card_d    = rashnubook_get_option('home_banner_card_desc', 'ویژه‌نامه «تحلیل حقوقی و فلسفی آثار هدایت، ساعدی و دانشور» با همکاری استادان دانشگاه تهران.');
             $b_card_f    = rashnubook_get_option('home_banner_card_footer', 'قطع رقعی • ۹۶ صفحه • کاغذ نخودی ۷۰ گرم');
+            $aftab_cover_img = rashnubook_get_option('aftabgardan_cover_image', '');
+            $aftab_logo_img  = rashnubook_get_option('aftabgardan_logo_image', '');
         ?>
             <section class="tento-aftabgardan-banner" aria-label="<?php esc_attr_e('ماهنامه ادبی آفتابگردان', 'rashnubook'); ?>">
                 <div class="aftabgardan-grid">
@@ -282,23 +306,35 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
                     </div>
 
                     <div class="aftabgardan-cover">
-                        <div class="aftabgardan-cover-card">
+                        <div class="aftabgardan-cover-card" style="background: linear-gradient(145deg, #FAF7F2 0%, #EAE1D0 100%); border-radius: 12px; border-right: 5px solid #cfbe9f; box-shadow: -10px 18px 36px rgba(0, 0, 0, 0.4); padding: 22px; color: #1e293b; position: relative; overflow: hidden;">
+                            <?php if (!empty($aftab_cover_img)) : ?>
+                                <div style="margin:-22px -22px 14px -22px; max-height:140px; overflow:hidden;">
+                                    <img src="<?php echo esc_url($aftab_cover_img); ?>" alt="<?php echo esc_attr($b_card_t); ?>" style="width:100%; height:140px; object-fit:cover; display:block;">
+                                </div>
+                            <?php endif; ?>
+
                             <?php if ($b_card_b) : ?>
                                 <div class="aftabgardan-badge" style="background: var(--paper); color: var(--mocha); margin-bottom: 12px; font-weight: 800;">
                                     <?php echo esc_html($b_card_b); ?>
                                 </div>
                             <?php endif; ?>
 
-                            <h3 style="font-size: 20px; font-weight: 900; color: var(--mocha); margin-bottom: 8px;">
+                            <?php if (!empty($aftab_logo_img)) : ?>
+                                <div style="margin-bottom:8px;">
+                                    <img src="<?php echo esc_url($aftab_logo_img); ?>" alt="لوگو" style="max-height:26px; width:auto; display:block;">
+                                </div>
+                            <?php endif; ?>
+
+                            <h3 style="font-size: 20px; font-weight: 900; color: #0f172a; margin-bottom: 8px;">
                                 <?php echo esc_html($b_card_t); ?>
                             </h3>
 
-                            <p style="font-size: 12px; color: var(--charcoal-muted); line-height: 1.7; margin-bottom: 16px;">
+                            <p style="font-size: 13px; font-weight: 600; color: #1e293b; line-height: 1.8; margin-bottom: 16px;">
                                 <?php echo esc_html($b_card_d); ?>
                             </p>
 
                             <?php if ($b_card_f) : ?>
-                                <div style="font-size: 11px; color: var(--secondary); border-top: 1px dashed var(--border-editorial); padding-top: 10px;">
+                                <div style="font-size: 11.5px; font-weight: 700; color: #334155; border-top: 1px dashed #cbd5e1; padding-top: 10px;">
                                     <?php echo esc_html($b_card_f); ?>
                                 </div>
                             <?php endif; ?>
@@ -316,9 +352,9 @@ $home_trust_enable = rashnubook_get_option('home_trust_enable', '1') !== '0';
             $bl_title   = rashnubook_get_option('home_blog_title', 'یادداشت‌های تحلیلی و معرفی کتاب‌ها');
             $bl_count   = (int)rashnubook_get_option('home_blog_count', 3);
             $bl_link_t  = rashnubook_get_option('home_blog_link_text', 'آرشیو همه یادداشت‌ها');
-            $bl_link_u  = rashnubook_get_option('home_blog_link_url', home_url('/?post_type=post'));
-            if (empty($bl_link_u)) {
-                $bl_link_u = home_url('/?post_type=post');
+            $bl_link_u  = rashnubook_get_option('home_blog_link_url', home_url('/blog/'));
+            if (empty($bl_link_u) || $bl_link_u === home_url('/?post_type=post')) {
+                $bl_link_u = home_url('/blog/');
             }
         ?>
             <section class="tento-articles-section" aria-label="<?php esc_attr_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?>">

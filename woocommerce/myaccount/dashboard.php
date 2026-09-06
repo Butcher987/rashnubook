@@ -20,7 +20,7 @@ $current_user = wp_get_current_user();
             </a>
         </div>
         <p class="rb-welcome-desc">
-            از طریق پیشخوان حساب کاربری خود می‌توانید وضعیت سفارش‌های اخیر را بررسی و رهگیری کنید، آدرس‌های پستی جهت ارسال رایگان بسته‌های کتاب را مدیریت نمایید و مشخصات فردی و رمز عبور خود را ویرایش کنید.
+            از طریق پیشخوان حساب کاربری خود می‌توانید وضعیت سفارش‌های اخیر را بررسی و رهگیری کنید، آدرس‌های پستی جهت ارسال بسته‌های کتاب را مدیریت نمایید و مشخصات فردی و رمز عبور خود را ویرایش کنید.
         </p>
     </div>
 
@@ -39,7 +39,7 @@ $current_user = wp_get_current_user();
                 <span class="dashicons dashicons-location-alt"></span>
             </div>
             <strong class="rb-dash-card-title">آدرس‌های تحویل</strong>
-            <span class="rb-dash-card-sub">مدیریت آدرس پستی برای ارسال رایگان</span>
+            <span class="rb-dash-card-sub">مدیریت آدرس پستی جهت ارسال سفارش‌ها</span>
         </a>
 
         <a href="<?php echo esc_url(wc_get_endpoint_url('edit-account')); ?>" class="rb-dash-card">

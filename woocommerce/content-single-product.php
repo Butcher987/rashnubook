@@ -20,23 +20,16 @@ if (post_password_required()) {
 }
 
 $product_id = $product->get_id();
-$author     = get_post_meta($product_id, '_book_author', true);
-$translator = get_post_meta($product_id, '_book_translator', true);
-$publisher  = get_post_meta($product_id, '_book_publisher', true);
-$isbn       = get_post_meta($product_id, '_book_isbn', true);
-$pages      = get_post_meta($product_id, '_book_pages', true);
-$edition    = get_post_meta($product_id, '_book_edition', true);
-$quote      = get_post_meta($product_id, '_book_quote', true);
-
-if (empty($author) && $product->get_attribute('author')) {
-    $author = $product->get_attribute('author');
-}
-if (empty($translator) && $product->get_attribute('translator')) {
-    $translator = $product->get_attribute('translator');
-}
-if (empty($publisher)) {
-    $publisher = 'کتابفروشی آنلاین رَشن';
-}
+$attrs      = function_exists('rashnubook_get_book_attributes') ? rashnubook_get_book_attributes($product_id) : array();
+$author     = $attrs['author'] ?? get_post_meta($product_id, '_book_author', true);
+$translator = $attrs['translator'] ?? get_post_meta($product_id, '_book_translator', true);
+$publisher  = $attrs['publisher'] ?? get_post_meta($product_id, '_book_publisher', true);
+$isbn       = $attrs['isbn'] ?? get_post_meta($product_id, '_book_isbn', true);
+$pages      = $attrs['pages'] ?? get_post_meta($product_id, '_book_pages', true);
+$format     = $attrs['format'] ?? get_post_meta($product_id, '_book_format', true);
+$cover      = $attrs['cover'] ?? get_post_meta($product_id, '_book_cover', true);
+$edition    = $attrs['edition'] ?? get_post_meta($product_id, '_book_edition', true);
+$quote      = $attrs['excerpt'] ?? get_post_meta($product_id, '_book_quote', true);
 ?>
 
 <div id="product-<?php the_ID(); ?>" <?php wc_product_class('book-single-container', $product); ?>>
@@ -98,10 +91,22 @@ if (empty($publisher)) {
 
         <!-- Col 2: Book Details, Meta, Specs & Buy Box -->
         <div class="book-single-info">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                <span style="font-size: 12px; background: var(--card-sand); color: var(--primary); padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600;">
-                    <?php echo esc_html($publisher); ?>
-                </span>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+                <?php if (!empty($publisher)) : ?>
+                    <span style="font-size: 12px; background: var(--card-sand); color: var(--primary); padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600;">
+                        نشر: <?php echo esc_html($publisher); ?>
+                    </span>
+                <?php endif; ?>
+                <?php if (!empty($format)) : ?>
+                    <span style="font-size: 12px; background: rgba(31,77,58,0.08); color: var(--primary); padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600;">
+                        قطع <?php echo esc_html($format); ?>
+                    </span>
+                <?php endif; ?>
+                <?php if (!empty($cover)) : ?>
+                    <span style="font-size: 12px; background: rgba(165,106,74,0.1); color: var(--tertiary); padding: 2px 8px; border-radius: var(--radius-sm); font-weight: 600;">
+                        <?php echo esc_html($cover); ?>
+                    </span>
+                <?php endif; ?>
                 <?php if (!empty($edition)) : ?>
                     <span style="font-size: 12px; color: var(--secondary); font-weight: 600;">
                         <?php echo esc_html($edition); ?>
@@ -149,21 +154,37 @@ if (empty($publisher)) {
 
             <!-- Book Specifications Table -->
             <div style="margin-top: 32px;">
-                <h3 style="font-size: 18px; color: var(--primary); margin-bottom: 12px;">شناسنامه و مشخصات کتاب</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <h3 style="font-size: 18px; color: var(--primary); margin: 0;">شناسنامه و مشخصات کتاب</h3>
+                    <?php if (current_user_can('edit_post', $product_id)) : ?>
+                        <a href="<?php echo esc_url(get_edit_post_link($product_id)); ?>" target="_blank" style="font-size: 12px; color: var(--secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 600;">
+                            <span>ویرایش مشخصات (قطع، جلد...)</span>
+                            <span style="font-size: 13px;">✏️</span>
+                        </a>
+                    <?php endif; ?>
+                </div>
                 <table class="book-specs-table">
                     <tbody>
                         <?php if (!empty($author)) : ?>
-                            <tr><td>نویسنده</td><td><?php echo esc_html($author); ?></td></tr>
+                            <tr><td>نویسنده / پدیدآور</td><td><?php echo esc_html($author); ?></td></tr>
                         <?php endif; ?>
                         <?php if (!empty($translator)) : ?>
                             <tr><td>مترجم</td><td><?php echo esc_html($translator); ?></td></tr>
                         <?php endif; ?>
-                        <tr><td>ناشر</td><td><?php echo esc_html($publisher); ?></td></tr>
+                        <?php if (!empty($publisher)) : ?>
+                            <tr><td>ناشر</td><td><?php echo esc_html($publisher); ?></td></tr>
+                        <?php endif; ?>
                         <?php if (!empty($isbn)) : ?>
                             <tr><td>شابک (ISBN)</td><td><?php echo esc_html(rashnubook_to_persian_numbers($isbn)); ?></td></tr>
                         <?php endif; ?>
                         <?php if (!empty($pages)) : ?>
                             <tr><td>تعداد صفحه</td><td><?php echo esc_html(rashnubook_to_persian_numbers($pages)); ?> صفحه</td></tr>
+                        <?php endif; ?>
+                        <?php if (!empty($format)) : ?>
+                            <tr><td>قطع کتاب</td><td><?php echo esc_html($format); ?></td></tr>
+                        <?php endif; ?>
+                        <?php if (!empty($cover)) : ?>
+                            <tr><td>نوع جلد</td><td><?php echo esc_html($cover); ?></td></tr>
                         <?php endif; ?>
                         <?php if (!empty($edition)) : ?>
                             <tr><td>نوبت چاپ</td><td><?php echo esc_html($edition); ?></td></tr>

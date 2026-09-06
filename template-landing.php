@@ -10,6 +10,34 @@ if (!defined('ABSPATH')) {
 }
 
 get_header();
+
+$landing_badge = rashnubook_get_option('landing_hero_badge', 'پروموشن ویژه کتابفروشی آنلاین رَشن');
+$landing_sub   = rashnubook_get_option('landing_hero_sub', 'روایتی کم‌نظیر از ادبیات داستانی معاصر، چاپ ویژه همراه با صحافی نفیس و ارسال پستی به سراسر کشور');
+$landing_quote_text = rashnubook_get_option('landing_quote_text', 'اثری که نگرش شما را نسبت به ادبیات و هستی دگرگون خواهد کرد.');
+$landing_quote_author = rashnubook_get_option('landing_quote_author', 'نقد ضمیمه فرهنگی رشنو');
+$landing_spec_format = rashnubook_get_option('landing_spec_format', 'وزیری - گالینگور زرکوب نفیس');
+$landing_spec_paper = rashnubook_get_option('landing_spec_paper', 'بالکی کرم سوئدی (سبک و ضد خستگی چشم)');
+$landing_spec_edition = rashnubook_get_option('landing_spec_edition', 'ویرایش نو - بهار ۱۴۰۳');
+$landing_spec_shipping = rashnubook_get_option('landing_spec_shipping', 'پست پیشتاز اختصاصی در بسته‌بندی حباب‌دار ایمن');
+$landing_cta_pid = (int)rashnubook_get_option('landing_cta_product_id', 0);
+if (!$landing_cta_pid && function_exists('get_page_by_path')) {
+    $fallback_landing_p = get_page_by_path('landing-katouzian-law-package', OBJECT, 'product');
+    if ($fallback_landing_p) {
+        $landing_cta_pid = $fallback_landing_p->ID;
+    }
+}
+$landing_cta_product = ($landing_cta_pid && function_exists('wc_get_product')) ? wc_get_product($landing_cta_pid) : null;
+$landing_cta_old_price = rashnubook_get_option('landing_cta_old_price', ($landing_cta_product && $landing_cta_product->is_on_sale()) ? rashnubook_to_persian_numbers($landing_cta_product->get_regular_price()) . ' تومان' : '۴۵۰,۰۰۰ تومان');
+$landing_cta_price = rashnubook_get_option('landing_cta_price', $landing_cta_product ? rashnubook_to_persian_numbers($landing_cta_product->get_price()) . ' تومان' : '۳۸۵,۰۰۰ تومان');
+
+$landing_cta_custom_link = rashnubook_get_option('landing_cta_link', '');
+if (!empty($landing_cta_custom_link)) {
+    $landing_cta_link = $landing_cta_custom_link;
+} elseif ($landing_cta_product) {
+    $landing_cta_link = function_exists('wc_get_cart_url') ? add_query_arg('add-to-cart', $landing_cta_product->get_id(), wc_get_cart_url()) : $landing_cta_product->add_to_cart_url();
+} else {
+    $landing_cta_link = class_exists('WooCommerce') ? wc_get_page_permalink('shop') : '#';
+}
 ?>
 
 <main id="primary" class="site-main landing-page-wrapper">
@@ -18,12 +46,10 @@ get_header();
         <div class="container">
             <span class="hero-badge">
                 <?php rashnubook_icon('star'); ?>
-                <span>پروموشن ویژه کتابفروشی آنلاین رَشن</span>
+                <span><?php echo esc_html($landing_badge); ?></span>
             </span>
             <h1 class="landing-hero-title"><?php the_title(); ?></h1>
-            <p class="landing-hero-sub">
-                روایتی کم‌نظیر از ادبیات داستانی معاصر، چاپ ویژه همراه با صحافی نفیس و ارسال رایگان پستی به سراسر کشور
-            </p>
+            <p class="landing-hero-sub"><?php echo esc_html($landing_sub); ?></p>
 
             <!-- Countdown Timer -->
             <?php echo do_shortcode('[rashnubook_countdown hours="36"]'); ?>
@@ -53,7 +79,7 @@ get_header();
             </div>
 
             <!-- Editorial Quote -->
-            <?php echo do_shortcode('[rashnubook_quote text="اثری که نگرش شما را نسبت به ادبیات و هستی دگرگون خواهد کرد." author="نقد ضمیمه فرهنگی رشنو"]'); ?>
+            <?php echo do_shortcode('[rashnubook_quote text="' . esc_attr($landing_quote_text) . '" author="' . esc_attr($landing_quote_author) . '"]'); ?>
 
             <!-- Book Specifications Box -->
             <div style="background: var(--paper); border: 1px solid var(--border-editorial); border-radius: var(--radius-md); padding: 28px; margin: 40px 0;">
@@ -62,10 +88,10 @@ get_header();
                 </h3>
                 <table class="book-specs-table">
                     <tbody>
-                        <tr><td>قطع و جلد</td><td>وزیری - گالینگور زرکوب نفیس</td></tr>
-                        <tr><td>نوع کاغذ</td><td>بالکی کرم سوئدی (سبک و ضد خستگی چشم)</td></tr>
-                        <tr><td>نوبت چاپ</td><td>ویرایش نو - بهار ۱۴۰۳</td></tr>
-                        <tr><td>ارسال</td><td>پست پیشتاز اختصاصی در بسته‌بندی حباب‌دار ایمن</td></tr>
+                        <tr><td>قطع و جلد</td><td><?php echo esc_html($landing_spec_format); ?></td></tr>
+                        <tr><td>نوع کاغذ</td><td><?php echo esc_html($landing_spec_paper); ?></td></tr>
+                        <tr><td>نوبت چاپ</td><td><?php echo esc_html($landing_spec_edition); ?></td></tr>
+                        <tr><td>ارسال</td><td><?php echo esc_html($landing_spec_shipping); ?></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -107,20 +133,25 @@ get_header();
             </div>
 
             <!-- Conversion Action Box -->
-            <div id="order-now" class="purchase-box" style="text-align: center; background: #ffffff; box-shadow: var(--shadow-elevation);">
-                <span style="font-size: 13px; color: var(--secondary); font-weight: 700;">فرصت محدود تا پایان موجودی چاپ نفیس</span>
-                <h2 style="font-size: 26px; color: var(--primary); margin: 8px 0;">هم‌اکنون نسخه خود را دریافت کنید</h2>
-                <div style="margin: 16px 0;">
-                    <span style="font-size: 16px; text-decoration: line-through; color: var(--outline); margin-left: 12px;">۴۵۰,۰۰۰ تومان</span>
-                    <span style="font-size: 26px; font-weight: 800; color: var(--primary);">۳۸۵,۰۰۰ تومان</span>
+            <?php
+            $landing_cta_enable = rashnubook_get_option('aftabgardan_plans_enable', rashnubook_get_option('landing_cta_enable', '1')) !== '0';
+            if ($landing_cta_enable) :
+            ?>
+                <div id="order-now" class="purchase-box" style="text-align: center; background: #ffffff; box-shadow: var(--shadow-elevation);">
+                    <span style="font-size: 13px; color: var(--secondary); font-weight: 700;">فرصت محدود تا پایان موجودی چاپ نفیس</span>
+                    <h2 style="font-size: 26px; color: var(--primary); margin: 8px 0;">هم‌اکنون نسخه خود را دریافت کنید</h2>
+                    <div style="margin: 16px 0;">
+                        <span style="font-size: 16px; text-decoration: line-through; color: var(--outline); margin-left: 12px;"><?php echo esc_html($landing_cta_old_price); ?></span>
+                        <span style="font-size: 26px; font-weight: 800; color: var(--primary);"><?php echo esc_html($landing_cta_price); ?></span>
+                    </div>
+                    <?php if (class_exists('WooCommerce')) : ?>
+                        <a href="<?php echo esc_url($landing_cta_link); ?>" class="btn btn-primary" style="padding: 14px 40px; font-size: 16px; margin: 0 auto;">
+                            <?php rashnubook_icon('cart'); ?>
+                            <span>تکمیل سفارش و پرداخت آنلاین</span>
+                        </a>
+                    <?php endif; ?>
                 </div>
-                <?php if (class_exists('WooCommerce')) : ?>
-                    <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="btn btn-primary" style="padding: 14px 40px; font-size: 16px; margin: 0 auto;">
-                        <?php rashnubook_icon('cart'); ?>
-                        <span>تکمیل سفارش و پرداخت آنلاین</span>
-                    </a>
-                <?php endif; ?>
-            </div>
+            <?php endif; ?>
         </div>
     </section>
 </main>

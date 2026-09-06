@@ -28,13 +28,20 @@ if (!defined('ABSPATH')) {
             <div class="container">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <?php rashnubook_icon('shipping'); ?>
-                    <span><?php echo esc_html(rashnubook_get_option('topbar_text', 'ارسال سریع و کاملاً رایگان کتاب به سراسر کشور | اینستاگرام: rashno_book@')); ?></span>
+                    <span><?php echo esc_html(rashnubook_get_option('topbar_text', 'ارسال سریع پستی کتاب به سراسر کشور | اینستاگرام: rashno_book@')); ?></span>
                 </div>
                 <div class="topbar-info" style="display: flex; align-items: center; gap: 16px;">
-                    <a href="https://instagram.com/<?php echo esc_attr(rashnubook_get_option('instagram', 'rashno_book')); ?>" target="_blank" rel="noopener" style="color:#ffe088; display:flex; align-items:center; gap:6px; font-weight:700; text-decoration:none;">
+                    <?php
+                    $top_insta_url = rashnubook_get_option('social_instagram', '');
+                    if (empty($top_insta_url)) {
+                        $top_insta_url = 'https://instagram.com/' . rashnubook_get_option('instagram', 'rashno_book');
+                    }
+                    $top_insta_user = rashnubook_get_option('instagram', 'rashno_book');
+                    ?>
+                    <a href="<?php echo esc_url($top_insta_url); ?>" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.92); display: flex; align-items: center; gap: 6px; font-weight: 700; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#ffffff';" onmouseout="this.style.color='rgba(255,255,255,0.92)';">
                         <?php rashnubook_icon('instagram'); ?>
                         <span>اینستاگرام:</span>
-                        <span><?php echo esc_html(rashnubook_get_option('instagram', 'rashno_book')); ?>@</span>
+                        <span dir="ltr">@<?php echo esc_html($top_insta_user); ?></span>
                     </a>
                     <span style="opacity: 0.4;">|</span>
                     <span><?php esc_html_e('پشتیبانی:', 'rashnubook'); ?> <?php echo esc_html(rashnubook_get_option('phone', '۰۲۱-۸۸۹۹۰۰۱۱')); ?></span>
@@ -69,6 +76,21 @@ if (!defined('ABSPATH')) {
                     </div>
                 </div>
 
+                <!-- Live Search Form with Ajax Results -->
+                <div class="header-search">
+                    <form role="search" method="get" class="search-form-wrap" action="<?php echo esc_url(home_url('/')); ?>">
+                        <?php if (class_exists('WooCommerce')) : ?>
+                            <input type="hidden" name="post_type" value="product">
+                        <?php endif; ?>
+                        <input type="search" class="search-input" placeholder="<?php esc_attr_e('جستجوی عنوان کتاب، نویسنده، مترجم، نشر یا شابک...', 'rashnubook'); ?>" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" data-ajax-search>
+                        <button type="submit" class="search-btn" aria-label="<?php esc_attr_e('جستجو', 'rashnubook'); ?>">
+                            <?php rashnubook_icon('search'); ?>
+                            <span class="search-btn-text"><?php esc_html_e('جستجو', 'rashnubook'); ?></span>
+                        </button>
+                    </form>
+                    <div class="search-results-dropdown" data-search-dropdown style="display:none;" aria-live="polite"></div>
+                </div>
+
                 <!-- Header Actions (Account & Cart) -->
                 <div class="header-actions">
                     <?php if (class_exists('WooCommerce')) : ?>
@@ -88,50 +110,52 @@ if (!defined('ABSPATH')) {
                         </a>
                     <?php endif; ?>
                 </div>
-
-                <!-- Live Search Form with Ajax Results -->
-                <div class="header-search">
-                    <form role="search" method="get" class="search-form-wrap" action="<?php echo esc_url(home_url('/')); ?>">
-                        <?php if (class_exists('WooCommerce')) : ?>
-                            <input type="hidden" name="post_type" value="product">
-                        <?php endif; ?>
-                        <input type="search" class="search-input" placeholder="<?php esc_attr_e('جستجوی عنوان کتاب، نویسنده، مترجم، نشر یا شابک...', 'rashnubook'); ?>" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" data-ajax-search>
-                        <button type="submit" class="search-btn" aria-label="<?php esc_attr_e('جستجو', 'rashnubook'); ?>">
-                            <?php rashnubook_icon('search'); ?>
-                            <span class="search-btn-text"><?php esc_html_e('جستجو', 'rashnubook'); ?></span>
-                        </button>
-                    </form>
-                    <div class="search-results-dropdown" data-search-dropdown style="display:none;" aria-live="polite"></div>
-                </div>
             </div>
         </div>
 
         <!-- Navigation Bar -->
         <div class="nav-bar">
             <div class="container">
-                <nav id="site-navigation" class="main-navigation" aria-label="<?php esc_attr_e('منوی اصلی', 'rashnubook'); ?>">
-                    <?php
-                    if (has_nav_menu('primary')) {
-                        wp_nav_menu(array(
-                            'theme_location' => 'primary',
-                            'container'      => false,
-                            'menu_class'     => 'main-nav-list',
-                            'fallback_cb'    => false,
-                            'items_wrap'     => '%3$s',
-                        ));
-                    } else {
-                        // Default Fallback Menu
-                        ?>
-                        <a href="<?php echo esc_url(home_url('/')); ?>" class="<?php echo is_front_page() ? 'active' : ''; ?>"><?php esc_html_e('خانه', 'rashnubook'); ?></a>
-                        <?php if (class_exists('WooCommerce')) : ?>
-                            <a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="<?php echo is_shop() ? 'active' : ''; ?>"><?php esc_html_e('کتاب‌ها و کاتالوگ', 'rashnubook'); ?></a>
-                        <?php endif; ?>
-                        <a href="<?php echo esc_url(home_url('/aftabgardan/')); ?>"><?php esc_html_e('صفحه فرود ویژه', 'rashnubook'); ?></a>
-                        <a href="<?php echo esc_url(home_url('/blog/')); ?>"><?php esc_html_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?></a>
+                <div class="nav-bar-inner">
+                    <!-- Category Dropdown Button (Editable via WordPress Menus -> Category Menu) -->
+                    <div class="nav-category-dropdown" id="nav-cat-dropdown">
+                        <button type="button" class="nav-category-btn" id="nav-cat-btn" aria-expanded="false" aria-haspopup="true">
+                            <span class="nav-cat-icon"><?php rashnubook_icon('menu'); ?></span>
+                            <span class="nav-cat-label"><?php esc_html_e('دسته‌بندی‌های کتاب', 'rashnubook'); ?></span>
+                            <svg class="nav-cat-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div class="nav-category-menu" id="nav-cat-menu">
+                            <?php rashnubook_render_header_category_dropdown(); ?>
+                        </div>
+                    </div>
+
+                    <!-- Main Navigation Links (Primary Menu with Sub-menu Dropdowns) -->
+                    <nav id="site-navigation" class="main-navigation" aria-label="<?php esc_attr_e('منوی اصلی', 'rashnubook'); ?>">
                         <?php
-                    }
-                    ?>
-                </nav>
+                        if (has_nav_menu('primary')) {
+                            wp_nav_menu(array(
+                                'theme_location' => 'primary',
+                                'container'      => false,
+                                'menu_class'     => 'main-nav-list',
+                                'fallback_cb'    => false,
+                            ));
+                        } else {
+                            // Default Fallback Menu
+                            ?>
+                            <ul class="main-nav-list">
+                                <li><a href="<?php echo esc_url(home_url('/')); ?>" class="<?php echo is_front_page() ? 'active' : ''; ?>"><?php esc_html_e('خانه', 'rashnubook'); ?></a></li>
+                                <?php if (class_exists('WooCommerce')) : ?>
+                                    <li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>" class="<?php echo (is_shop() || is_product_taxonomy()) ? 'active' : ''; ?>"><?php esc_html_e('کتاب‌ها و دیگر محصولات', 'rashnubook'); ?></a></li>
+                                <?php endif; ?>
+                                <li><a href="<?php echo esc_url(home_url('/categories/')); ?>" class="<?php echo (is_page('categories') || (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/categories') !== false)) ? 'active' : ''; ?>"><?php esc_html_e('راهنمای موضوعی کتاب‌ها', 'rashnubook'); ?></a></li>
+                                <li><a href="<?php echo esc_url(home_url('/aftabgardan/')); ?>" class="<?php echo is_page('aftabgardan') ? 'active' : ''; ?>"><?php esc_html_e('صفحه رویدادهای ویژه', 'rashnubook'); ?></a></li>
+                                <li><a href="<?php echo esc_url(home_url('/blog/')); ?>" class="<?php echo (is_home() || (is_archive() && !is_shop() && !is_product_taxonomy()) || is_singular('post')) ? 'active' : ''; ?>"><?php esc_html_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?></a></li>
+                            </ul>
+                            <?php
+                        }
+                        ?>
+                    </nav>
+                </div>
             </div>
         </div>
     </header>
@@ -152,37 +176,19 @@ if (!defined('ABSPATH')) {
             <button type="button" class="mobile-drawer-close-btn" data-drawer-close="mobile-menu" aria-label="<?php esc_attr_e('بستن منو', 'rashnubook'); ?>"><?php rashnubook_icon('close'); ?></button>
         </div>
         <div class="mobile-drawer-body">
-            <!-- Book Categories Section -->
-            <div class="drawer-section">
-                <div class="drawer-section-title">
-                    <?php rashnubook_icon('book'); ?>
-                    <span><?php esc_html_e('دسته‌بندی‌های موضوعی کتاب', 'rashnubook'); ?></span>
+            <!-- Book Categories Section (Dynamic & Synchronized with WordPress Menus / WooCommerce) -->
+            <?php
+            $drawer_cats_enable = rashnubook_get_option('drawer_cats_enable', '1') !== '0';
+            if ($drawer_cats_enable) :
+            ?>
+                <div class="drawer-section">
+                    <div class="drawer-section-title">
+                        <?php rashnubook_icon('book'); ?>
+                        <span><?php esc_html_e('دسته‌بندی‌های موضوعی کتاب', 'rashnubook'); ?></span>
+                    </div>
+                    <?php rashnubook_render_drawer_category_menu(); ?>
                 </div>
-                <div class="drawer-cat-list">
-                    <a href="<?php echo esc_url(add_query_arg('product_cat', 'law-books', home_url('/shop/'))); ?>" class="drawer-cat-item">
-                        <span class="drawer-cat-dot" style="background:#1F4D3A;"></span>
-                        <span class="drawer-cat-name">کتب تخصصی حقوقی و آزمونی</span>
-                        <span class="drawer-cat-badge">وکالت و قضاوت</span>
-                    </a>
-                    <a href="<?php echo esc_url(add_query_arg('product_cat', 'fiction', home_url('/shop/'))); ?>" class="drawer-cat-item">
-                        <span class="drawer-cat-dot" style="background:#A56A4A;"></span>
-                        <span class="drawer-cat-name">ادبیات داستانی و رمان</span>
-                        <span class="drawer-cat-badge">شاهکارها</span>
-                    </a>
-                    <a href="<?php echo esc_url(add_query_arg('product_cat', 'philosophy', home_url('/shop/'))); ?>" class="drawer-cat-item">
-                        <span class="drawer-cat-dot" style="background:#3B2F2F;"></span>
-                        <span class="drawer-cat-name">فلسفه، منطق و حکمت</span>
-                    </a>
-                    <a href="<?php echo esc_url(add_query_arg('product_cat', 'poetry', home_url('/shop/'))); ?>" class="drawer-cat-item">
-                        <span class="drawer-cat-dot" style="background:#7C8B6A;"></span>
-                        <span class="drawer-cat-name">شعر کهن و دیوان معاصر</span>
-                    </a>
-                    <a href="<?php echo esc_url(add_query_arg('product_cat', 'psychology', home_url('/shop/'))); ?>" class="drawer-cat-item">
-                        <span class="drawer-cat-dot" style="background:#854f34;"></span>
-                        <span class="drawer-cat-name">روان‌شناسی و خودکاوی</span>
-                    </a>
-                </div>
-            </div>
+            <?php endif; ?>
 
             <!-- Main Navigation Links -->
             <div class="drawer-section">
@@ -201,9 +207,10 @@ if (!defined('ABSPATH')) {
                     <ul class="mobile-nav-list">
                         <li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('صفحه اصلی', 'rashnubook'); ?></a></li>
                         <?php if (class_exists('WooCommerce')) : ?>
-                            <li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('ویترین و کاتالوگ کتاب‌ها', 'rashnubook'); ?></a></li>
+                            <li><a href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>"><?php esc_html_e('کتاب‌ها و دیگر محصولات', 'rashnubook'); ?></a></li>
                         <?php endif; ?>
-                        <li><a href="<?php echo esc_url(home_url('/aftabgardan/')); ?>"><?php esc_html_e('ماهنامه ادبی آفتابگردان (صفحه ویژه)', 'rashnubook'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/categories/')); ?>"><?php esc_html_e('دسته‌بندی‌های کتاب (فهرست کامل)', 'rashnubook'); ?></a></li>
+                        <li><a href="<?php echo esc_url(home_url('/aftabgardan/')); ?>"><?php esc_html_e('صفحه رویدادهای ویژه (آفتابگردان)', 'rashnubook'); ?></a></li>
                         <li><a href="<?php echo esc_url(home_url('/blog/')); ?>"><?php esc_html_e('یادداشت‌ها و نقد کتاب', 'rashnubook'); ?></a></li>
                         <li><a href="<?php echo esc_url(home_url('/about-us/')); ?>"><?php esc_html_e('درباره کتابفروشی آنلاین رَشن', 'rashnubook'); ?></a></li>
                         <li><a href="<?php echo esc_url(home_url('/contact-us/')); ?>"><?php esc_html_e('تماس با ما و ساعات کاری', 'rashnubook'); ?></a></li>
