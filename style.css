@@ -17,3 +17,4 @@ Designed with love for Persian literature, books, and thoughtful publishing.
 */
 
 /* Core CSS is loaded modularly from assets/css/main.css and assets/css/woocommerce.css */
+@import url('assets/css/woocommerce-blocks-fix.css');
